@@ -14,10 +14,4 @@
 
 #### Launch files
 
-### L22_AERO_SIM
-#### Nodes
-
-#### Topics
-
-#### Launch files
 GAZEBO
