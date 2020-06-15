@@ -63,7 +63,7 @@ class ColorRectMarker_p:
         self.points_img = cr.points_img
         return self
     def toMsg(self):
-        return ColorRectMarker(color=self.color, cx_img=self.cx_img, cy_img=self.cy_img, cx_cam=self.cx_cam, cx_cam=self.cy_cam, cx_cam=self.cz_cam)
+        return ColorRectMarker(color=self.color, cx_img=self.cx_img, cy_img=self.cy_img, cx_cam=self.cx_cam, cy_cam=self.cy_cam, cz_cam=self.cz_cam)
     def __str__(self):
         return "color: {}\n  coords: {} {} {}".format(self.color, str(self.cx_cam), str(self.cy_cam), str(self.cz_cam))
 
