@@ -149,7 +149,7 @@ def img_clb(msg: Image):
             print("RES: \n " + "\n ".join(map(str, result)))
     cv2.waitKey(1)
 
-    markers_arr = ColorRectMarkerArray(header=Header(stamp=rospy.time(), frame_id="color_marker_cam"), markers=[r.toMsg() for r in result])
+    markers_arr = ColorRectMarkerArray(header=Header(stamp=rospy.Time.now(), frame_id="color_marker_cam"), markers=[r.toMsg() for r in result])
     markers_arr_pub.publish(markers_arr)
 
 
