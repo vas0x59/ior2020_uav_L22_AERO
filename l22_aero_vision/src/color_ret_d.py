@@ -62,7 +62,7 @@ class ColorRectMarker_p:
         self.points_img = cr.points_img
         return self
     def __str__(self):
-        return "color: {}, coords: {} {} {}".format(self.color, str(self.cx_cam), str(self.cy_cam), str(self.cz_cam))
+        return "color: {}\n  coords: {} {} {}".format(self.color, str(self.cx_cam), str(self.cy_cam), str(self.cz_cam))
 
 cameraMatrix = np.zeros((3, 3), dtype="float64")
 distCoeffs = np.zeros((8, 1), dtype="float64")
@@ -119,7 +119,7 @@ def draw_color_rect(image, cr: ColorRect):
 def get_rect_pose(rect, op, cM, dC) -> ColorRectMarker_p:
     print("shapes", op.shape, rect.points_img.shape)
     retval, rvec, tvec = cv2.solvePnP(np.array(op, dtype="float64"), np.array(rect.points_img, dtype="float64"), cM, dC)
-    return ColorRectMarker_p(cx_cam=tvec[0], cy_cam=tvec[1], cz_cam=tvec[2]).fromColorRect(rect)
+    return ColorRectMarker_p(cx_cam=tvec[0][0], cy_cam=tvec[1][0], cz_cam=tvec[2][0]).fromColorRect(rect)
 
 def img_clb(msg: Image):
     global has_cam_info, cameraMatrix, distCoeffs
@@ -143,7 +143,7 @@ def img_clb(msg: Image):
         for r in result_in_img_frame:
             result.append(get_rect_pose(r, objectPoint, cameraMatrix, distCoeffs))
         if len(result) > 0:
-            print("RES: \n" + "\n ".join(map(str, result)))
+            print("RES: \n " + "\n ".join(map(str, result)))
     cv2.waitKey(1)
 
 
