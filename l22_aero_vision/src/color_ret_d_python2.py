@@ -6,11 +6,11 @@ import rospy
 import time
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import CameraInfo
-from std_msgs.msg import Int32
+from std_msgs.msg import Int32, Header, Float32
 from cv_bridge import CvBridge, CvBridgeError
 import cv2
 import numpy as np
-# from l22_aero_vision.msg import ColorRectMarker
+from l22_aero_vision.msg import ColorRectMarker, ColorRectMarkerArray
 
 rospy.init_node('l22_aero_color_node', anonymous=True)
 bridge = CvBridge()

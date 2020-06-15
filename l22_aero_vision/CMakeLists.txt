@@ -20,8 +20,14 @@ add_message_files(
   ColorRectMarkerArray.msg
 )
 
+catkin_python_setup()
 
-# catkin_python_setup()
+# generate_messages()
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
+
 
 
 catkin_package(
