@@ -21,7 +21,7 @@ bridge = CvBridge()
 colors_p_hsv = {
     "yellow": (np.array([8,  60,  60]), np.array([35,  255, 255])),
     "red": (np.array([160, 80,  80]), np.array([255, 255, 255]), np.array([0, 80,  80]), np.array([8, 255, 255])),
-    "blue": (np.array([90,  70,  70]), np.array([160, 255, 255])),
+    "blue": (np.array([161,  56,  109]), np.array([181, 126, 151])),
     "green": (np.array([90,  70,  70]), np.array([160, 255, 255])),
     "brown": (np.array([160, 80,  80]), np.array([255, 255, 255]), np.array([0, 80,  80]), np.array([8, 255, 255]))
 }
@@ -33,11 +33,12 @@ colors_p_rgb = {
     "brown": [165, 42, 42]
 }
 
-MARKER_SIDE_SIZE = 0.3 # in m
+MARKER_SIDE1_SIZE = 0.06 # in m
+MARKER_SIDE2_SIZE = 0.09 # in m
 OBJ_S_THRESH = 150
 
-objectPoint = np.array(map(np.array, [(-MARKER_SIDE_SIZE / 2, -MARKER_SIDE_SIZE / 2, 0), (MARKER_SIDE_SIZE / 2, -MARKER_SIDE_SIZE / 2, 0), 
-                        (MARKER_SIDE_SIZE / 2, MARKER_SIDE_SIZE / 2, 0), (-MARKER_SIDE_SIZE / 2, MARKER_SIDE_SIZE / 2, 0)]))
+objectPoint = np.array([(-MARKER_SIDE1_SIZE / 2, -MARKER_SIDE2_SIZE / 2, 0), (MARKER_SIDE1_SIZE / 2, -MARKER_SIDE2_SIZE / 2, 0), 
+                        (MARKER_SIDE1_SIZE / 2, MARKER_SIDE2_SIZE / 2, 0), (-MARKER_SIDE1_SIZE / 2, MARKER_SIDE2_SIZE / 2, 0)])
 print("objectPoint shape:", objectPoint.shape)
 class ColorRect:
     def __init__(self, cx_img=0, cy_img=0, color="none", points_img=[]):
@@ -61,7 +62,7 @@ class ColorRectMarker_p:
         self.points_img = cr.points_img
         return self
     def __str__(self):
-        return "coords: {} {} {}".format(str(self.cx_cam), str(self.cy_cam), str(self.cz_cam))
+        return "color: {}, coords: {} {} {}".format(self.color, str(self.cx_cam), str(self.cy_cam), str(self.cz_cam))
 
 cameraMatrix = np.zeros((3, 3), dtype="float64")
 distCoeffs = np.zeros((8, 1), dtype="float64")
@@ -116,17 +117,21 @@ def draw_color_rect(image, cr: ColorRect):
     return image
 
 def get_rect_pose(rect, op, cM, dC) -> ColorRectMarker_p:
-    retval, rvec, tvec = cv2.solvePnP(op, rect.points_img, cM, dC)
+    print("shapes", op.shape, rect.points_img.shape)
+    retval, rvec, tvec = cv2.solvePnP(np.array(op, dtype="float64"), np.array(rect.points_img, dtype="float64"), cM, dC)
     return ColorRectMarker_p(cx_cam=tvec[0], cy_cam=tvec[1], cz_cam=tvec[2]).fromColorRect(rect)
 
 def img_clb(msg: Image):
     global has_cam_info, cameraMatrix, distCoeffs
     image = bridge.imgmsg_to_cv2(msg, "bgr8")
+    # image[:, :, 2] = np.clip(image[:, :, 2]*0.7, 0, 255)
+    # image[:, :, 1] = np.clip(image[:, :, 1]*1.2, 0, 255)
+    # image[:, :, 0] = np.clip(image[:, :, 0]*1.5, 0, 255)
     out = image.copy()
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
     result_in_img_frame = [] # ColorRect
-    for c_name in ["red", "yellow", "blue"]:
+    for c_name in ["blue"]:
         cnts, d_img = get_color_objs(image, hsv, colors_p_hsv[c_name])
         draw_cnts_colors(out, cnts, c_name)
         result_in_img_frame += get_color_rects(cnts, c_name)
@@ -136,8 +141,9 @@ def img_clb(msg: Image):
     result = []
     if has_cam_info:
         for r in result_in_img_frame:
-            result += get_rect_pose(r, objectPoint, cameraMatrix, distCoeffs)
-        print(result)
+            result.append(get_rect_pose(r, objectPoint, cameraMatrix, distCoeffs))
+        if len(result) > 0:
+            print("RES: \n" + "\n ".join(map(str, result)))
     cv2.waitKey(1)
 
 
