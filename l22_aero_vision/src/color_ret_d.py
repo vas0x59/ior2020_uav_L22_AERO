@@ -106,6 +106,7 @@ def img_clb(msg: Image):
     result_in_img_frame = [] # ColorRect
     for c_name in ["red", "yellow", "blue"]:
         cnts, d_img = get_color_objs(image, hsv, colors_p_hsv[c_name])
+        draw_cnts_colors(out, cnts, c_name)
         result_in_img_frame += get_color_rects(cnts, c_name)
     for i in result_in_img_frame:
         draw_color_rect(out, i)
