@@ -72,11 +72,9 @@ def get_color_objs(image, hsv, color_params):
 def get_color_rects(cnts, color_name):
     result = []
     for cnt in cnts:
-        
-        peri = cv2.arcLength(cnt, True)
-        approx = cv2.approxPolyDP(cnt, 0.04 * peri, True)
+        approx = cv2.approxPolyDP(cnt, 0.1 * cv2.arcLength(cnt, True), True)
         if len(approx) == 4:
-            points_img = approx # ?
+            points_img = [p[0] for p in approx] # ?
             M = cv2.moments(cnt)
             cX = int((M["m10"] / (M["m00"] + 1e-7)))
             cY = int((M["m01"] / (M["m00"] + 1e-7)))
@@ -94,7 +92,7 @@ def draw_cnts_colors(image, cnts, color_name):
     return image
 def draw_color_rect(image, cr:ColorRect):
     for i, p in enumerate(cr.points_img):
-        cv2.circle(image, p, 5, ((i+1)*(255//4), (i+1)*(255//4), (i+1)*(255//4)), -1)
+        cv2.circle(image, tuple(p), 5, ((i+1)*(255//4), (i+1)*(255//4), (i+1)*(255//4)), -1)
     cv2.circle(image, (cr.cx_img, cr.cy_img), 5, colors_p_rgb[cr.color], -1)
     return image
 
