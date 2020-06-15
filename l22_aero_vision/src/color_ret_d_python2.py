@@ -1,7 +1,5 @@
-#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# tested on python3
 # Иморт всего что надо
 import math
 import rospy
