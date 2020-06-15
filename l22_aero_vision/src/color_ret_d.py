@@ -8,15 +8,16 @@ import rospy
 import time
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import CameraInfo
-from std_msgs.msg import Int32
+from std_msgs.msg import Int32, Header, Float32
 from cv_bridge import CvBridge, CvBridgeError
 import cv2
 import numpy as np
-# from l22_aero_vision.msg import ColorRectMarker
+from l22_aero_vision.msg import ColorRectMarker, ColorRectMarkerArray
 
 rospy.init_node('l22_aero_color_node', anonymous=True)
 bridge = CvBridge()
 
+markers_arr_pub = rospy.Publisher("/l22_aero_color/markers", ColorRectMarkerArray)
 
 colors_p_hsv = {
     "yellow": (np.array([8,  60,  60]), np.array([35,  255, 255])),
@@ -61,6 +62,8 @@ class ColorRectMarker_p:
         self.color = cr.color
         self.points_img = cr.points_img
         return self
+    def toMsg(self):
+        return ColorRectMarker(color=self.color, cx_img=self.cx_img, cy_img=self.cy_img, cx_cam=self.cx_cam, cx_cam=self.cy_cam, cx_cam=self.cz_cam)
     def __str__(self):
         return "color: {}\n  coords: {} {} {}".format(self.color, str(self.cx_cam), str(self.cy_cam), str(self.cz_cam))
 
@@ -122,7 +125,7 @@ def get_rect_pose(rect, op, cM, dC) -> ColorRectMarker_p:
     return ColorRectMarker_p(cx_cam=tvec[0][0], cy_cam=tvec[1][0], cz_cam=tvec[2][0]).fromColorRect(rect)
 
 def img_clb(msg: Image):
-    global has_cam_info, cameraMatrix, distCoeffs
+    global has_cam_info, cameraMatrix, distCoeffs, markers_arr_pub
     image = bridge.imgmsg_to_cv2(msg, "bgr8")
     # image[:, :, 2] = np.clip(image[:, :, 2]*0.7, 0, 255)
     # image[:, :, 1] = np.clip(image[:, :, 1]*1.2, 0, 255)
@@ -145,6 +148,9 @@ def img_clb(msg: Image):
         if len(result) > 0:
             print("RES: \n " + "\n ".join(map(str, result)))
     cv2.waitKey(1)
+
+    markers_arr = ColorRectMarkerArray(header=Header(stamp=rospy.time(), frame_id="color_marker_cam"), markers=[r.toMsg() for r in result])
+    markers_arr_pub.publish(markers_arr)
 
 
 image_sub = rospy.Subscriber(
