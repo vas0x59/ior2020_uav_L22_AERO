@@ -39,7 +39,7 @@ OBJ_S_THRESH = 150
 
 objectPoint = np.array([(-MARKER_SIDE1_SIZE / 2, -MARKER_SIDE2_SIZE / 2, 0), (MARKER_SIDE1_SIZE / 2, -MARKER_SIDE2_SIZE / 2, 0), 
                         (MARKER_SIDE1_SIZE / 2, MARKER_SIDE2_SIZE / 2, 0), (-MARKER_SIDE1_SIZE / 2, MARKER_SIDE2_SIZE / 2, 0)])
-print("objectPoint shape:", objectPoint.shape)
+# print("objectPoint shape:", objectPoint.shape)
 class ColorRect:
     def __init__(self, cx_img=0, cy_img=0, color="none", points_img=[]):
         self.cx_img = cx_img
@@ -117,7 +117,7 @@ def draw_color_rect(image, cr: ColorRect):
     return image
 
 def get_rect_pose(rect, op, cM, dC) -> ColorRectMarker_p:
-    print("shapes", op.shape, rect.points_img.shape)
+    # print("shapes", op.shape, rect.points_img.shape)
     retval, rvec, tvec = cv2.solvePnP(np.array(op, dtype="float64"), np.array(rect.points_img, dtype="float64"), cM, dC)
     return ColorRectMarker_p(cx_cam=tvec[0][0], cy_cam=tvec[1][0], cz_cam=tvec[2][0]).fromColorRect(rect)
 
