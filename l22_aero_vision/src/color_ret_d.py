@@ -12,7 +12,7 @@ from std_msgs.msg import Int32
 from cv_bridge import CvBridge, CvBridgeError
 import cv2
 import numpy as np
-from l22_aero_vision.msg import ColorRectMarker
+# from l22_aero_vision.msg import ColorRectMarker
 
 rospy.init_node('l22_aero_color_node', anonymous=True)
 bridge = CvBridge()
@@ -99,19 +99,18 @@ def draw_color_rect(image, cr:ColorRect):
     return image
 
 def img_clb(msg: Image):
-    
     image = bridge.imgmsg_to_cv2(msg, "bgr8")
     out = image.copy()
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
     result_in_img_frame = [] # ColorRect
-    for c_name in ["red", "yellow", "blue", "green", "brown"]:
+    for c_name in ["red", "yellow", "blue"]:
         cnts, d_img = get_color_objs(image, hsv, colors_p_hsv[c_name])
         result_in_img_frame += get_color_rects(cnts, c_name)
     for i in result_in_img_frame:
         draw_color_rect(out, i)
-        # for i, p in enumerate(cnt):
-        #     cv2.circle(out, tuple(p[0]), 5, (0, (i+1)*(255//4)//2, (i+1)*(255//4)), -1)
+    cv2.imshow("out", out)
+    cv2.waitKey(1)
 
 
 image_sub = rospy.Subscriber(
@@ -121,4 +120,4 @@ camera_info_sub = rospy.Subscriber(
     "/main_camera/camera_info", CameraInfo, camera_info_clb)
 
 
-
+rospy.spin()
