@@ -11,21 +11,22 @@ try:
     from clover           import srv
 except:
     from clever           import srv
+
 from std_srvs.srv         import Trigger
 from mavros_msgs.srv      import CommandBool
 from sensor_msgs.msg      import Image
 from std_msgs.msg         import String
 from pyzbar               import pyzbar
 from cv_bridge            import CvBridge
+import sys
+#sys.path.insert(1, "/home/dmitrii/catkin_ws/src/ior2020_uav_L22_AERO")
+sys.path.append('/home/dmitrii/catkin_ws/src/ior2020_uav_L22_AERO')
 from l22_aero_vision.msg  import ColorRectMarker
 from l22_aero_vision.msg  import ColorRectMarkerArray
 from l22_aero_vision.src.tools.tf_tools import *
 
 
-nav_broadcaster = tf.TransformBroadcaster()
-# tf_buffer = tf2_ros.Buffer()
-# tf_listener = tf2_ros.TransformListener(tf_buffer)
-listener = tf.TransformListener()
+
 
 
 coordinates = {
@@ -56,6 +57,12 @@ set_rates = rospy.ServiceProxy('set_rates', srv.SetRates)
 land_serv = rospy.ServiceProxy('land', Trigger)
 arming = rospy.ServiceProxy('mavros/cmd/arming', CommandBool)
 
+nav_broadcaster = tf.TransformBroadcaster()
+# tf_buffer = tf2_ros.Buffer()
+# tf_listener = tf2_ros.TransformListener(tf_buffer)
+listener = tf.TransformListener()
+
+
 def navigate_aruco(x=0, y=0, z=0, yaw=float('nan'), speed=0.4,  floor=False):
     '''
     Фукнция для полета до точки без ожидания долета до нее
@@ -78,11 +85,11 @@ def takeoff(z):
     rospy.sleep(2)
     navigate_aruco(x=telem.x, y=telem.y, z=z, speed=0.4, floor=True)
 
-def navigate_wait(x, y, z, speed=0.4, tolerance=0.13):
+def navigate_wait(x, y, z, yaw=float('nan'), speed=0.4, tolerance=0.13):
     '''
     Фукнция для полета до точки с ожиданием долета до нее
     '''
-    navigate_aruco(x=x, y=y, z=z, speed=speed)
+    navigate_aruco(x=x, y=y, z=z, yaw=yaw, speed=speed)
     while not rospy.is_shutdown():
         telem = get_telemetry(frame_id='navigate_target')
         # print(telem.x, telem.y, telem.z)
@@ -103,6 +110,9 @@ class ColorRectMarkerMap:
         self.cx_map = cx_map
         self.cy_map = cy_map
         self.color = color
+    def __str__(self):
+        return "color: {}\n  coords map: {} {}".format(self.color, str(self.cx_map), str(self.cy_map))
+
 
 class Recognition:
     def __init__(self):
@@ -117,7 +127,8 @@ class Recognition:
         self.image_sub = rospy.Subscriber('main_camera/image_raw', Image, self.image_callback)
         self.qr_pub = rospy.Publisher('/qr_debug', Image, queue_size=1)
         self.coords_sub = sub = rospy.Subscriber("/l22_aero_color/markers", ColorRectMarkerArray, self.markers_arr_clb)
-        self.result = None
+        self.result = []
+        
         
 
     def transform_marker(self, marker, frame_to="aruco_map"):# -> ColorRectMarkerMap:
@@ -131,8 +142,8 @@ class Recognition:
         self.result = []
         for marker in msg.markers:
             self.result.append(self.transform_marker(marker, frame_to="aruco_map"))
-        if len(self.result) > 0:
-            print("RES: \n " + "\n ".join(map(str, self.result)))
+        #if len(self.result) > 0:
+            #print("RES: \n " + "\n ".join(map(str, self.result)))
 
     def image_callback(self, data):
         self.cv_image = cv2.resize(self.bridge.imgmsg_to_cv2(data, 'bgr8'), (320, 240))
@@ -160,23 +171,25 @@ class Recognition:
         '''
         # arr = [[color1, x1, y1, z1], [color2, x2, y2, z2]]
         global coordinates
-        arr = None
-        TOLERANCE = 0.5 #in meters
-        for i in range(len(arr)):
-            if arr[i][0] not in coordinates:
-                color = type_mapping[arr[i][0]]
+        TOLERANCE = 0.35 #in meters
+        for i in range(len(self.result)):
+            if self.result[i].color not in coordinates:
+                color = type_mapping[self.result[i].color]
             else:
-                color = arr[i][0]
-            tempCoords = (arr[i][1], arr[i][2])
+                color = self.result[i].color
+            tempCoords = (self.result[i].cx_map, self.result[i].cy_map)
             if len(coordinates[color]) == 0:
                 coordinates[color].append(tempCoords)
             else:
                 for j in range(len(coordinates[color])):
+                    '''
                     if self.distance(coordinates[color][j], tempCoords) <= TOLERANCE:
                         coordinates[color][j] = self.average(tempCoords, coordinates[color][j])
                         break
-                else:
-                    coordinates[color].append(tempCoords)
+                    '''
+                #else:
+                coordinates[color].append(tempCoords)
+
 
     def waitDataQR(self):
         '''
@@ -199,15 +212,16 @@ class Recognition:
         return self.most_frequent(arr)
     
 rc = Recognition()
+#rospy.spin()
 
 z = 1.5
 
 deltaX = 1.3
 deltaY = 0.8
-LENGTH_POLE = 3 #in meters
+LENGTH_POLE = 3.9 #in meters
 
 takeoff(z)
-navigate_wait(0, 0, 1)
+navigate_wait(0, 0, 1, yaw = 3.14/2)
 
 qr = rc.waitDataQR()
 if qr == 'seed':
@@ -230,7 +244,9 @@ while i <= LENGTH_POLE:
         if count % 2 == 0: navigate_wait(i, j, z)
         else: navigate_wait(i, LENGTH_POLE-j, z)
         j += deltaY
+        print(111)
         rc.coordsFunc()
+        rospy.sleep(0.3)
         #SOME STUFF HAPPENS HERE
     i += deltaX
     count += 1
