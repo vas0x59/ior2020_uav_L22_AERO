@@ -28,8 +28,10 @@ from l22_aero_vision.msg  import ColorRectMarkerArray
 from l22_aero_vision.src.tools.tf_tools import *
 
 
-
-
+Z_TOL = 0.5
+TOLERANCE_COORDS = 0.4 #in meters
+COORDS_UPDATE_RATE = 1
+# ARUCO_TELEM_RATE = 5
 
 coordinates = {
     'water': [],
@@ -50,6 +52,25 @@ type_mapping = {
 rospy.init_node('flight')
 
 get_telemetry = rospy.ServiceProxy('get_telemetry', srv.GetTelemetry)
+
+
+# global_telem_body = get_telemetry_clever(frame_id="body")
+# global_telem_aruco = get_telemetry(frame_id="aruco_map")
+# global_telem_navigate_target = get_telemetry(frame_id="navigate_target")
+# def get_telem_thread_func():
+#     global global_telem_aruco, global_telem_navigate_target
+#     r2 = rospy.Rate(ARUCO_TELEM_RATE*2)
+#     while True:
+#         global_telem_aruco = get_telemetry(frame_id="aruco_map")
+#         r2.sleep()
+#         global_telem_navigate_target = get_telemetry(frame_id="navigate_target")
+#         r2.sleep()
+# get_telem_thread =  threading.Thread(target=get_telem_thread_func)
+# get_telem_thread.daemon = True
+# get_telem_thread.start()
+
+
+
 navigate = rospy.ServiceProxy('navigate', srv.Navigate)
 navigate_global = rospy.ServiceProxy('navigate_global', srv.NavigateGlobal)
 set_position = rospy.ServiceProxy('set_position', srv.SetPosition)
@@ -64,6 +85,10 @@ nav_broadcaster = tf.TransformBroadcaster()
 # tf_listener = tf2_ros.TransformListener(tf_buffer)
 listener = tf.TransformListener()
 
+##### 
+
+Z = 0
+
 
 def navigate_aruco(x=0, y=0, z=0, yaw=float('nan'), speed=0.4,  floor=False):
     '''
@@ -72,10 +97,12 @@ def navigate_aruco(x=0, y=0, z=0, yaw=float('nan'), speed=0.4,  floor=False):
     return navigate(x=x, y=y, z=z, yaw=yaw, speed=speed, frame_id='aruco_map')
 
 def get_telemetry_aruco():
+    # global global_telem_aruco
     '''
     Функция для получения телеметрии
     '''
     telem = get_telemetry(frame_id="aruco_map")
+    # Z = telem.z
     return telem
 
 def takeoff(z):
@@ -87,13 +114,14 @@ def takeoff(z):
     rospy.sleep(2)
     navigate_aruco(x=telem.x, y=telem.y, z=z, speed=0.4, floor=True)
 
-def navigate_wait(x, y, z, yaw=float('nan'), speed=0.4, tolerance=0.13):
+def navigate_wait(x, y, z, yaw=float('nan'), speed=0.2, tolerance=0.13):
+    # global global_telem_navigate_target
     '''
     Фукнция для полета до точки с ожиданием долета до нее
     '''
     navigate_aruco(x=x, y=y, z=z, yaw=yaw, speed=speed)
     while not rospy.is_shutdown():
-        telem = get_telemetry(frame_id='navigate_target')
+        telem = get_telemetry(frame_id="navigate_target")
         # print(telem.x, telem.y, telem.z)
         if math.sqrt(telem.x ** 2 + telem.y ** 2 + telem.z ** 2) < tolerance:
             break
@@ -108,12 +136,13 @@ def land():
     arming(False)
 
 class ColorRectMarkerMap:
-    def __init__(self, cx_map=0, cy_map=0, color="none"):
+    def __init__(self, cx_map=0, cy_map=0, cz_map=0, color="none"):
         self.cx_map = cx_map
         self.cy_map = cy_map
+        self.cz_map = cz_map
         self.color = color
     def __str__(self):
-        return "color: {}\n  coords map: {} {}".format(self.color, str(self.cx_map), str(self.cy_map))
+        return "color: {}\n  coords map: {} {} {}".format(self.color, str(self.cx_map), str(self.cy_map), str(self.cz_map))
 
 
 class Recognition:
@@ -130,22 +159,26 @@ class Recognition:
         self.qr_pub = rospy.Publisher('/qr_debug', Image, queue_size=1)
         self.coords_sub = sub = rospy.Subscriber("/l22_aero_color/markers", ColorRectMarkerArray, self.markers_arr_clb)
         self.result = []
-        # self.coords_thread = threading.Thread()
+
+        self.coords_thread = threading.Thread(target=self.coords_thread_func)
+        self.coords_thread.daemon = True
+        self.coords_thread.start()
         
         
 
     def transform_marker(self, marker, frame_to="aruco_map"):# -> ColorRectMarkerMap:
         cx_map = 0
         cy_map = 0
-        cx_map, cy_map, _, _ = transform_xyz_yaw(
+        cz_map = 0
+        cx_map, cy_map, cz_map, _ = transform_xyz_yaw(
             marker.cx_cam, marker.cy_cam, marker.cz_cam, 0, "main_camera_optical", frame_to, listener)
-        return ColorRectMarkerMap(color=marker.color, cx_map=cx_map, cy_map=cy_map)
+        return ColorRectMarkerMap(color=marker.color, cx_map=cx_map, cy_map=cy_map, cz_map=cz_map)
 
     def markers_arr_clb(self, msg):#: ColorRectMarkerArray):
-        self.result = []
+        # self.result = []
         for marker in msg.markers:
             self.result.append(self.transform_marker(marker, frame_to="aruco_map"))
-        self.coordsFunc()
+        # self.coordsFunc()
         #if len(self.result) > 0:
             #print("RES: \n " + "\n ".join(map(str, self.result)))
 
@@ -171,30 +204,35 @@ class Recognition:
         return ((coord1[0] + coord2[0])/2, (coord1[1] + coord2[1])/2)
 
     def coordsFunc(self):
+        # global Z
         '''
         '''
         # arr = [[color1, x1, y1, z1], [color2, x2, y2, z2]]
-        global coordinates
-        TOLERANCE = 0.6 #in meters
+        global coordinateы
+        # Z = get_telemetry_aruco().z
         for i in range(len(self.result)):
             if self.result[i].color not in coordinates:
                 color = type_mapping[self.result[i].color]
             else:
                 color = self.result[i].color
+            # if (self.result[i].cz_map - Z) < Z_TOL:
             tempCoords = (self.result[i].cx_map, self.result[i].cy_map)
             if tempCoords[0] < 0 or tempCoords[1] < 0: continue
             if len(coordinates[color]) == 0:
                 coordinates[color].append(tempCoords)
             else:
                 for j in range(len(coordinates[color])):
-                    if self.distance(coordinates[color][j], tempCoords) <= TOLERANCE:
+                    if self.distance(coordinates[color][j], tempCoords) <= TOLERANCE_COORDS:
                         coordinates[color][j] = self.average(tempCoords, coordinates[color][j])
                         break
                 else:
                     coordinates[color].append(tempCoords)
-    # def coords_thread_func(self):
-    #     r = rospy.Rate()
-    #     while True:
+        self.result = []
+    def coords_thread_func(self):
+        r = rospy.Rate(COORDS_UPDATE_RATE)
+        while True:
+            self.coordsFunc()
+            r.sleep()
 
 
     def waitDataQR(self):
@@ -222,7 +260,7 @@ rc = Recognition()
 
 z = 1.5
 
-deltaX = 1.3
+deltaX = 0.8
 deltaY = 0.8
 LENGTH_POLE = 3.9 #in meters
 
@@ -251,7 +289,7 @@ while i <= LENGTH_POLE:
         else: navigate_wait(i, LENGTH_POLE-j, z)
         j += deltaY
         # rc.coordsFunc()
-        rospy.sleep(0.3)
+        rospy.sleep(0.01)
         #SOME STUFF HAPPENS HERE
     i += deltaX
     count += 1
