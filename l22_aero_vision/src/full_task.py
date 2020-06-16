@@ -81,7 +81,7 @@ def takeoff(z):
     Функция для взлета
     '''
     telem = get_telemetry_aruco()
-    navigate(z=z, speed=0.4, frame_id="body", auto_arm=True)
+    navigate(z=z, speed=0.3, frame_id="body", auto_arm=True)
     rospy.sleep(2)
     navigate_aruco(x=telem.x, y=telem.y, z=z, speed=0.4, floor=True)
 
@@ -171,7 +171,7 @@ class Recognition:
         '''
         # arr = [[color1, x1, y1, z1], [color2, x2, y2, z2]]
         global coordinates
-        TOLERANCE = 0.35 #in meters
+        TOLERANCE = 0.6 #in meters
         for i in range(len(self.result)):
             if self.result[i].color not in coordinates:
                 color = type_mapping[self.result[i].color]
@@ -182,13 +182,12 @@ class Recognition:
                 coordinates[color].append(tempCoords)
             else:
                 for j in range(len(coordinates[color])):
-                    '''
+                    if coordinates[color][j][0] < 0 or coordinates[color][j][1] < 0: continue
                     if self.distance(coordinates[color][j], tempCoords) <= TOLERANCE:
                         coordinates[color][j] = self.average(tempCoords, coordinates[color][j])
                         break
-                    '''
-                #else:
-                coordinates[color].append(tempCoords)
+                else:
+                    coordinates[color].append(tempCoords)
 
 
     def waitDataQR(self):
