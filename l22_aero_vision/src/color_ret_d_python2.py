@@ -10,6 +10,9 @@ from cv_bridge import CvBridge, CvBridgeError
 import cv2
 import numpy as np
 from l22_aero_vision.msg import ColorRectMarker, ColorRectMarkerArray
+# import tf
+
+
 
 rospy.init_node('l22_aero_color_node', anonymous=True)
 bridge = CvBridge()
@@ -38,7 +41,7 @@ colors_p_rgb = {
     "red": [0, 0, 255],
     "blue": [255, 0, 0],
     "green": [0, 255, 0],
-    "brown": [165, 42, 42]
+    "brown": [42, 42, 165]
 }
 
 MARKER_SIDE1_SIZE = 0.3 # in m
@@ -70,7 +73,7 @@ class ColorRectMarker_p:
         self.points_img = cr.points_img
         return self
     def toMsg(self):
-        return ColorRectMarker(color=self.color, cx_img=self.cx_img, cy_img=self.cy_img, cx_cam=self.cx_cam, cy_cam=self.cy_cam, cz_cam=self.cz_cam)
+        return ColorRectMarker(color=self.color, cx_img=self.cx_img, cy_img=self.cy_img, cx_cam=self.cx_cam, cy_cam=self.cy_cam, cz_cam=self.cz_cam, size1=MARKER_SIDE1_SIZE, size2=MARKER_SIDE2_SIZE)
     def __str__(self):
         return "color: {}\n  coords: {} {} {}".format(self.color, str(self.cx_cam), str(self.cy_cam), str(self.cz_cam))
 
