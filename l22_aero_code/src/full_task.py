@@ -208,7 +208,7 @@ class Recognition:
         '''
         '''
         # arr = [[color1, x1, y1, z1], [color2, x2, y2, z2]]
-        global coordinateы
+        global coordinates
         # Z = get_telemetry_aruco().z
         for i in range(len(self.result)):
             if self.result[i].color not in coordinates:
