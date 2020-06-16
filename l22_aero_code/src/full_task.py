@@ -93,7 +93,7 @@ def navigate_wait(x, y, z, yaw=float('nan'), speed=0.4, tolerance=0.13):
     while not rospy.is_shutdown():
         telem = get_telemetry(frame_id='navigate_target')
         # print(telem.x, telem.y, telem.z)
-        if math.sqrt((telem.x - x)** 2 + (telem.y - y)** 2 + (telem.z - z)** 2) < tolerance:
+        if math.sqrt(telem.x ** 2 + telem.y ** 2 + telem.z ** 2) < tolerance:
             break
         rospy.sleep(0.2)
 
@@ -178,11 +178,11 @@ class Recognition:
             else:
                 color = self.result[i].color
             tempCoords = (self.result[i].cx_map, self.result[i].cy_map)
+            if tempCoords[0] < 0 or tempCoords[1] < 0: continue
             if len(coordinates[color]) == 0:
                 coordinates[color].append(tempCoords)
             else:
                 for j in range(len(coordinates[color])):
-                    if coordinates[color][j][0] < 0 or coordinates[color][j][1] < 0: continue
                     if self.distance(coordinates[color][j], tempCoords) <= TOLERANCE:
                         coordinates[color][j] = self.average(tempCoords, coordinates[color][j])
                         break
@@ -243,7 +243,6 @@ while i <= LENGTH_POLE:
         if count % 2 == 0: navigate_wait(i, j, z)
         else: navigate_wait(i, LENGTH_POLE-j, z)
         j += deltaY
-        print(111)
         rc.coordsFunc()
         rospy.sleep(0.3)
         #SOME STUFF HAPPENS HERE
