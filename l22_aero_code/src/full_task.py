@@ -21,7 +21,6 @@ from cv_bridge            import CvBridge
 import sys
 import threading
 
-#sys.path.insert(1, "/home/dmitrii/catkin_ws/src/ior2020_uav_L22_AERO")
 sys.path.append('/home/dmitrii/catkin_ws/src/ior2020_uav_L22_AERO')
 from l22_aero_vision.msg  import ColorRectMarker
 from l22_aero_vision.msg  import ColorRectMarkerArray
@@ -260,9 +259,37 @@ rc = Recognition()
 
 z = 1.5
 
-deltaX = 0.8
-deltaY = 0.8
-LENGTH_POLE = 3.9 #in meters
+
+
+points = []
+
+FIELD_LENGTH = 3.9 #in meters
+deltaX = 0.5 #in meters
+deltaY = 0.3 #in meters
+betweenX = 3
+
+i, count = 0, 0
+
+def getAdditionalPoints(coord1, coord2, parts):
+    return zip(np.linspace(coord1[0], coord2[0], parts + 1), np.linspace(coord1[1], coord2[1], parts + 1))
+
+while i <= FIELD_LENGTH:
+    j = 0
+    while j <= FIELD_LENGTH:
+        if count % 2 == 0:
+            points.append((i, j))
+        else:
+            points.append((i, FIELD_LENGTH-j))
+        j += deltaY
+    d = j - FIELD_LENGTH
+    if d > 0: j -= d
+    if count % 2 == 0:
+        points += list(getAdditionalPoints((i, j), (i + deltaX, j), betweenX))
+    else:
+        points += list(getAdditionalPoints((i, FIELD_LENGTH - j), (i + deltaX, FIELD_LENGTH-j), betweenX))
+    i += deltaX
+    count += 1
+    
 
 takeoff(z)
 navigate_wait(0, 0, 1, yaw = 3.14/2)
@@ -278,21 +305,10 @@ print(qr)
 
 navigate_wait(0, 0, z)
 
-count = 0
-i = 0
+for point in points:
+    navigate_wait(x=point[0], y=point[1], z=z)
+    
 
-while i <= LENGTH_POLE:
-    j = 0
-    while j <= LENGTH_POLE:
-        telem = get_telemetry_aruco()
-        if count % 2 == 0: navigate_wait(i, j, z)
-        else: navigate_wait(i, LENGTH_POLE-j, z)
-        j += deltaY
-        # rc.coordsFunc()
-        rospy.sleep(0.01)
-        #SOME STUFF HAPPENS HERE
-    i += deltaX
-    count += 1
 
 navigate_wait(landCoordinates[0], landCoordinates[1], z)
 land()
