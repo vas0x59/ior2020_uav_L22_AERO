@@ -182,7 +182,7 @@ class Recognition:
                 coordinates[color].append(tempCoords)
             else:
                 for j in range(len(coordinates[color])):
-                    if coordinates[color][j][0] < 0 or coordinates[color][j][1] < 0: continue
+                    if coordinates[color][j][0] < 0 and coordinates[color][j][1] < 0: continue
                     if self.distance(coordinates[color][j], tempCoords) <= TOLERANCE:
                         coordinates[color][j] = self.average(tempCoords, coordinates[color][j])
                         break
