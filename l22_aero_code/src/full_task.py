@@ -210,7 +210,7 @@ class Recognition:
                 self.barcodeData = barcode.data.decode("utf-8")
                 xc = x + w/2
                 yc = y + h/2
-                self.cv_image = cv2.circle(self.cv_image, (xc, yc), 15, (0, 0, 0), 30)
+                self.cv_image = cv2.circle(self.cv_image, (int(xc), int(yc)), 15, (0, 0, 0), 30)
                 arr.append(self.barcodeData)
                 self.qr_pub.publish(self.bridge.cv2_to_imgmsg(self.cv_image, 'bgr8'))
             rospy.sleep(0.3)
