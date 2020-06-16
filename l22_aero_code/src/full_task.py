@@ -19,6 +19,8 @@ from std_msgs.msg         import String
 from pyzbar               import pyzbar
 from cv_bridge            import CvBridge
 import sys
+import threading
+
 #sys.path.insert(1, "/home/dmitrii/catkin_ws/src/ior2020_uav_L22_AERO")
 sys.path.append('/home/dmitrii/catkin_ws/src/ior2020_uav_L22_AERO')
 from l22_aero_vision.msg  import ColorRectMarker
@@ -128,6 +130,7 @@ class Recognition:
         self.qr_pub = rospy.Publisher('/qr_debug', Image, queue_size=1)
         self.coords_sub = sub = rospy.Subscriber("/l22_aero_color/markers", ColorRectMarkerArray, self.markers_arr_clb)
         self.result = []
+        # self.coords_thread = threading.Thread()
         
         
 
@@ -142,6 +145,7 @@ class Recognition:
         self.result = []
         for marker in msg.markers:
             self.result.append(self.transform_marker(marker, frame_to="aruco_map"))
+        self.coordsFunc()
         #if len(self.result) > 0:
             #print("RES: \n " + "\n ".join(map(str, self.result)))
 
@@ -188,6 +192,9 @@ class Recognition:
                         break
                 else:
                     coordinates[color].append(tempCoords)
+    # def coords_thread_func(self):
+    #     r = rospy.Rate()
+    #     while True:
 
 
     def waitDataQR(self):
@@ -243,7 +250,7 @@ while i <= LENGTH_POLE:
         if count % 2 == 0: navigate_wait(i, j, z)
         else: navigate_wait(i, LENGTH_POLE-j, z)
         j += deltaY
-        rc.coordsFunc()
+        # rc.coordsFunc()
         rospy.sleep(0.3)
         #SOME STUFF HAPPENS HERE
     i += deltaX
