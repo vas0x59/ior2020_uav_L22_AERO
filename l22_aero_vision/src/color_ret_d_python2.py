@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# Иморт всего что надо
 import math
 import rospy
 import time
@@ -14,6 +13,8 @@ from l22_aero_vision.msg import ColorRectMarker, ColorRectMarkerArray
 
 rospy.init_node('l22_aero_color_node', anonymous=True)
 bridge = CvBridge()
+
+markers_arr_pub = rospy.Publisher("/l22_aero_color/markers", ColorRectMarkerArray)
 
 '''
 colors_p_hsv = {
@@ -40,8 +41,8 @@ colors_p_rgb = {
     "brown": [165, 42, 42]
 }
 
-MARKER_SIDE1_SIZE = 0.06 # in m
-MARKER_SIDE2_SIZE = 0.09 # in m
+MARKER_SIDE1_SIZE = 0.3 # in m
+MARKER_SIDE2_SIZE = 0.3 # in m
 OBJ_S_THRESH = 150
 
 objectPoint = np.array([(-MARKER_SIDE1_SIZE / 2, -MARKER_SIDE2_SIZE / 2, 0), (MARKER_SIDE1_SIZE / 2, -MARKER_SIDE2_SIZE / 2, 0), 
@@ -68,6 +69,8 @@ class ColorRectMarker_p:
         self.color = cr.color
         self.points_img = cr.points_img
         return self
+    def toMsg(self):
+        return ColorRectMarker(color=self.color, cx_img=self.cx_img, cy_img=self.cy_img, cx_cam=self.cx_cam, cy_cam=self.cy_cam, cz_cam=self.cz_cam)
     def __str__(self):
         return "color: {}\n  coords: {} {} {}".format(self.color, str(self.cx_cam), str(self.cy_cam), str(self.cz_cam))
 
@@ -129,13 +132,14 @@ def get_rect_pose(rect, op, cM, dC):
     return ColorRectMarker_p(cx_cam=tvec[0][0], cy_cam=tvec[1][0], cz_cam=tvec[2][0]).fromColorRect(rect)
 
 def img_clb(msg):
-    global has_cam_info, cameraMatrix, distCoeffs
+    global has_cam_info, cameraMatrix, distCoeffs, markers_arr_pub
     image = bridge.imgmsg_to_cv2(msg, "bgr8")
     # image[:, :, 2] = np.clip(image[:, :, 2]*0.7, 0, 255)
     # image[:, :, 1] = np.clip(image[:, :, 1]*1.2, 0, 255)
     # image[:, :, 0] = np.clip(image[:, :, 0]*1.5, 0, 255)
     out = image.copy()
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
     result_in_img_frame = [] # ColorRect
     for c_name in ["blue", "yellow", "green", "red", "brown"]:
         cnts, d_img = get_color_objs(image, hsv, colors_p_hsv[c_name])
@@ -152,12 +156,14 @@ def img_clb(msg):
             print("RES: \n " + "\n ".join(map(str, result)))
     cv2.waitKey(1)
 
+    markers_arr = ColorRectMarkerArray(header=Header(stamp=rospy.Time.now(), frame_id="color_marker_cam"), markers=[r.toMsg() for r in result])
+    markers_arr_pub.publish(markers_arr)
+
 
 image_sub = rospy.Subscriber(
     "/main_camera/image_raw", Image, img_clb)
 
 camera_info_sub = rospy.Subscriber(
     "/main_camera/camera_info", CameraInfo, camera_info_clb)
-
 
 rospy.spin()
