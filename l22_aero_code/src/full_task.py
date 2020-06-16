@@ -93,7 +93,7 @@ def navigate_wait(x, y, z, yaw=float('nan'), speed=0.4, tolerance=0.13):
     while not rospy.is_shutdown():
         telem = get_telemetry(frame_id='navigate_target')
         # print(telem.x, telem.y, telem.z)
-        if math.sqrt(telem.x ** 2 + telem.y ** 2 + telem.z ** 2) < tolerance:
+        if math.sqrt((telem.x -x )** 2 + (telem.y - y)** 2 + (telem.z - z)** 2) < tolerance:
             break
         rospy.sleep(0.2)
 
