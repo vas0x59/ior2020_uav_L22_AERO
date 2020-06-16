@@ -15,7 +15,7 @@ rospy.init_node('l22_aero_color_node', anonymous=True)
 bridge = CvBridge()
 
 markers_arr_pub = rospy.Publisher("/l22_aero_color/markers", ColorRectMarkerArray)
-
+image_pub = rospy.Publisher("/l22_aero_color/debug_img", Image)
 '''
 colors_p_hsv = {
     "yellow": (np.array([8,  60,  60]), np.array([35,  255, 255])),
@@ -99,11 +99,13 @@ def get_color_objs(image, hsv, color_params):
     debug_out = cv2.bitwise_and(image, image, mask=mask)
     return cnts, debug_out
 
-def get_color_rects(cnts, color_name):
+def get_color_rects(cnts, color_name, image_shape=(240, 320, 3)):
     result = []
     for cnt in cnts:
-        approx = cv2.approxPolyDP(cnt, 0.1 * cv2.arcLength(cnt, True), True)
-        if len(approx) == 4:
+        approx = cv2.approxPolyDP(cnt, 0.08 * cv2.arcLength(cnt, True), True)
+        rect = cv2.minAreaRect(cnt)
+        print(rect)
+        if len(approx) == 4 and abs(1 - rect[1][0] / (rect[1][1] + 1e-7)) < 0.2 :
             points_img = np.array([np.array(p[0]) for p in approx]) # ?
             M = cv2.moments(cnt)
             cX = int((M["m10"] / (M["m00"] + 1e-7)))
@@ -134,6 +136,7 @@ def get_rect_pose(rect, op, cM, dC):
 def img_clb(msg):
     global has_cam_info, cameraMatrix, distCoeffs, markers_arr_pub
     image = bridge.imgmsg_to_cv2(msg, "bgr8")
+    print(image.shape)
     # image[:, :, 2] = np.clip(image[:, :, 2]*0.7, 0, 255)
     # image[:, :, 1] = np.clip(image[:, :, 1]*1.2, 0, 255)
     # image[:, :, 0] = np.clip(image[:, :, 0]*1.5, 0, 255)
@@ -147,17 +150,18 @@ def img_clb(msg):
         result_in_img_frame += get_color_rects(cnts, c_name)
     for i in result_in_img_frame:
         draw_color_rect(out, i)
-    cv2.imshow("out", out)
+    # cv2.imshow("out", out)
     result = []
     if has_cam_info:
         for r in result_in_img_frame:
             result.append(get_rect_pose(r, objectPoint, cameraMatrix, distCoeffs))
         if len(result) > 0:
             print("RES: \n " + "\n ".join(map(str, result)))
-    cv2.waitKey(1)
+    # cv2.waitKey(1)
 
     markers_arr = ColorRectMarkerArray(header=Header(stamp=rospy.Time.now(), frame_id="color_marker_cam"), markers=[r.toMsg() for r in result])
     markers_arr_pub.publish(markers_arr)
+    image_pub.publish(bridge.cv2_to_imgmsg(out, "bgr8"))
 
 
 image_sub = rospy.Subscriber(
