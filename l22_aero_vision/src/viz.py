@@ -94,9 +94,9 @@ def circles_arr_clb(msg):
 
         marker.color.a = 0.8
 
-        marker.color.r = colors_p_rgb[mrk.color][2] / 255
-        marker.color.g = colors_p_rgb[mrk.color][1] / 255
-        marker.color.b = colors_p_rgb[mrk.color][0] / 255
+        marker.color.r = colors_p_rgb[mrk.color][2] / 255.0
+        marker.color.g = colors_p_rgb[mrk.color][1] / 255.0
+        marker.color.b = colors_p_rgb[mrk.color][0] / 255.0
 
         result.append(marker)
         iddd += 1

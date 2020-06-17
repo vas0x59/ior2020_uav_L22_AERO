@@ -237,10 +237,10 @@ def img_clb(msg):
             result.append(get_rect_pose(r, objectPoint, cameraMatrix, distCoeffs))
         for c in circles_in_img_frame:
             circles.append(get_rect_pose(c, objectPoint_circles, cameraMatrix, distCoeffs))
-        if len(result) > 0:
-            print("RES: \n " + "\n ".join(map(str, result)))
-        if len(circles) > 0:
-            print("circles: \n " + "\n ".join(map(str, circles)))
+        # if len(result) > 0:
+        #     print("RES: \n " + "\n ".join(map(str, result)))
+        # if len(circles) > 0:
+        #     print("circles: \n " + "\n ".join(map(str, circles)))
     # cv2.waitKey(1)
     markers_arr_pub.publish(ColorRectMarkerArray(header=Header(stamp=rospy.Time.now(), frame_id="color_marker_cam"), markers=[r.toMsg() for r in result]))
     circles_arr_pub.publish(ColorRectMarkerArray(header=Header(stamp=rospy.Time.now(), frame_id="color_marker_cam"), markers=[r.toMsg() for r in circles]))
