@@ -5,6 +5,11 @@ import numpy as np
 import rospy
 # import tf2_geometry_msgs
 import tf
+import sys
+import threading
+
+sys.path.append('/home/dmitrii/catkin_ws/src/ior2020_uav_L22_AERO')
+sys.path.append('/home/pi/catkin_ws/src/ior2020_uav_L22_AERO')
 from l22_aero_vision.msg import ColorRectMarker, ColorRectMarkerArray
 # from l22_aero_vision.src.tool
 from l22_aero_vision.src.tools.tf_tools import *

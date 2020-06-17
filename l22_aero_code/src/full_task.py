@@ -22,6 +22,7 @@ import sys
 import threading
 
 sys.path.append('/home/dmitrii/catkin_ws/src/ior2020_uav_L22_AERO')
+sys.path.append('/home/pi/catkin_ws/src/ior2020_uav_L22_AERO')
 from l22_aero_vision.msg  import ColorRectMarker
 from l22_aero_vision.msg  import ColorRectMarkerArray
 from l22_aero_vision.src.tools.tf_tools import *
