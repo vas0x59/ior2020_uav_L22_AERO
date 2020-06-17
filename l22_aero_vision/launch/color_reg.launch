@@ -3,8 +3,8 @@
         args="messages main_camera/image_raw 15.0 main_camera/image_raw_throttled"/>
 
     <node pkg="l22_aero_vision" type="color_ret_circles_d_python2.py" name="l22_aero_vision_node" output="screen" clear_params="true">
-        <remap from="main_camera/image_raw_throttled" to="image_raw"/>
-        <remap from="main_camera/camera_info" to="camera_info"/>
+        <remap from="image_raw" to="main_camera/image_raw_throttled"/>
+        <remap from="camera_info" to="main_camera/camera_info"/>
     </node>
     <node pkg="l22_aero_vision" type="viz.py" name="l22_aero_vision_viz_node" output="screen" clear_params="true"/>
 </launch>
