@@ -12,6 +12,7 @@ type_mapping = {
 }
 
 for key in d:
+    if key in ['water_land', 'seed_land', 'pastures_land']: continue
     for i in range(len(d[key])):
         color = type_mapping[key]
         if d[key][i][0] < 0 or d[key][i][1] < 0: continue
