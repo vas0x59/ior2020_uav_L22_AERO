@@ -37,10 +37,8 @@ def markers_arr_clb(msg: ColorRectMarkerArray):
         print("RES: \n " + "\n ".join(map(str, result)))
 
 
-
-
-
 sub = rospy.Subscriber(
     "/l22_aero_color/markers", ColorRectMarkerArray, markers_arr_clb)
 
+rospy.spin()
 # tf.transformations.
