@@ -1,0 +1,4 @@
+<launch>
+    <node pkg="l22_aero_vision" type="color_ret_circles_d_python2.py" name="l22_aero_vision_node" output="screen" clear_params="true"/>
+    <node pkg="l22_aero_vision" type="viz.py" name="l22_aero_vision_viz_node" output="screen" clear_params="true"/>
+</launch>
