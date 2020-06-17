@@ -166,7 +166,7 @@ class Recognition:
         self.barcodeData = None
         self.bridge = CvBridge()
         self.cv_image = None
-        self.image_sub = rospy.Subscriber('main_camera/image_raw', Image, self.image_callback)
+        self.image_sub = rospy.Subscriber('image_raw', Image, self.image_callback)
         self.qr_pub = rospy.Publisher('/qr_debug', Image, queue_size=1)
         self.coords_sub = sub = rospy.Subscriber("/l22_aero_color/markers", ColorRectMarkerArray, self.markers_arr_clb)
         self.circles_sub = rospy.Subscriber("/l22_aero_color/circles", ColorRectMarkerArray, self.circles_arr_clb)
