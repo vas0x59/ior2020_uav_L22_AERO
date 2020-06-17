@@ -44,6 +44,14 @@ colors_p_rgb = {
     "brown": [42, 42, 165]
 }
 
+type_mapping = {
+    'blue': 'N2_water',
+    'green': 'N2_pastures',
+    'yellow': 'N2_seed',
+    'red': 'N2_potato',
+    'brown': 'N2_soil'
+}
+
 MARKER_SIDE1_SIZE = 0.3 # in m
 MARKER_SIDE2_SIZE = 0.3 # in m
 OBJ_S_THRESH = 150
@@ -116,15 +124,21 @@ def get_color_rects(cnts, color_name, image_shape=(240, 320, 3)):
             result.append(ColorRect(color=color_name, cx_img=cX, cy_img=cY, points_img=points_img))
     return result
 
-def draw_cnts_colors(image, cnts, color_name):
+def draw_cnts_colors(image, cnts, color_name, t = 1):
     for cnt in cnts:
         M = cv2.moments(cnt)
         cX = int((M["m10"] / (M["m00"] + 1e-7)))
         cY = int((M["m01"] / (M["m00"] + 1e-7)))
         cv2.drawContours(image, [cnt], -1, colors_p_rgb[color_name], 2)
-        cv2.putText(image, color_name, (cX, cY),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors_p_rgb[color_name], 2, cv2.LINE_AA)
+        if t:
+            cv2.rectangle(image,(cX,cY-15),(cX+75,cY+5),(255,255,255),-1)
+            cv2.putText(image, type_mapping[color_name], (cX, cY),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors_p_rgb[color_name], 2, cv2.LINE_AA)
+        else:
+            cv2.putText(image, color_name, (cX, cY),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors_p_rgb[color_name], 2, cv2.LINE_AA)
     return image
+
 def draw_color_rect(image, cr):
     for i, p in enumerate(cr.points_img):
         cv2.circle(image, tuple(p), 5, ((i+1)*(255//4), (i+1)*(255//4), (i+1)*(255//4)), -1)
