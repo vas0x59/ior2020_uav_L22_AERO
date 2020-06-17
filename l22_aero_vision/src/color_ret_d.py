@@ -19,12 +19,19 @@ bridge = CvBridge()
 
 markers_arr_pub = rospy.Publisher("/l22_aero_color/markers", ColorRectMarkerArray)
 
+# colors_p_hsv = {
+#     "yellow": (np.array([8,  60,  60]), np.array([35,  255, 255])),
+#     "red": (np.array([160, 80,  80]), np.array([255, 255, 255]), np.array([0, 80,  80]), np.array([8, 255, 255])),
+#     "blue": (np.array([161,  56,  109]), np.array([181, 126, 151])),
+#     "green": (np.array([90,  70,  70]), np.array([160, 255, 255])),
+#     "brown": (np.array([160, 80,  80]), np.array([255, 255, 255]), np.array([0, 80,  80]), np.array([8, 255, 255]))
+# }
 colors_p_hsv = {
-    "yellow": (np.array([8,  60,  60]), np.array([35,  255, 255])),
-    "red": (np.array([160, 80,  80]), np.array([255, 255, 255]), np.array([0, 80,  80]), np.array([8, 255, 255])),
-    "blue": (np.array([161,  56,  109]), np.array([181, 126, 151])),
-    "green": (np.array([90,  70,  70]), np.array([160, 255, 255])),
-    "brown": (np.array([160, 80,  80]), np.array([255, 255, 255]), np.array([0, 80,  80]), np.array([8, 255, 255]))
+    'blue': (np.array([72, 121, 67]), np.array([180, 255, 255])),
+    'green': (np.array([43, 121, 67]), np.array([116, 255, 255])),
+    'yellow': (np.array([15, 121, 67]), np.array([37, 255, 255])),
+    'red': (np.array([0, 121, 67]), np.array([5, 255, 255])),
+    'brown': (np.array([5, 121, 67]), np.array([24, 255, 255]))
 }
 colors_p_rgb = {
     "yellow": [0,  200,  200],
