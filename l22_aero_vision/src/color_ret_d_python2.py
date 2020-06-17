@@ -139,7 +139,7 @@ def get_rect_pose(rect, op, cM, dC):
 def img_clb(msg):
     global has_cam_info, cameraMatrix, distCoeffs, markers_arr_pub
     image = bridge.imgmsg_to_cv2(msg, "bgr8")
-    print(image.shape)
+    # print(image.shape)
     # image[:, :, 2] = np.clip(image[:, :, 2]*0.7, 0, 255)
     # image[:, :, 1] = np.clip(image[:, :, 1]*1.2, 0, 255)
     # image[:, :, 0] = np.clip(image[:, :, 0]*1.5, 0, 255)
