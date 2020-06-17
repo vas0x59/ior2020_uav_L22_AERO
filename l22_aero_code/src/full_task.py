@@ -37,7 +37,10 @@ coordinates = {
     'pastures': [],
     'seed': [],
     'potato': [],
-    'soil': []
+    'soil': [],
+    'water_land': [],
+    'seed_land': [],
+    'pastures_land': []
 }
 
 type_mapping = {
@@ -46,6 +49,15 @@ type_mapping = {
     'yellow': 'seed',
     'red': 'potato',
     'brown': 'soil'
+}
+
+circle_type_mapping = {
+    'seed': 'seed_land',
+    'pastures': 'pastures_land',
+    'water': 'water_land',
+    'blue': 'water_land',
+    'green': 'pastures_land',
+    'yellow': 'seed_land'
 }
 
 rospy.init_node('flight')
@@ -157,8 +169,10 @@ class Recognition:
         self.image_sub = rospy.Subscriber('main_camera/image_raw', Image, self.image_callback)
         self.qr_pub = rospy.Publisher('/qr_debug', Image, queue_size=1)
         self.coords_sub = sub = rospy.Subscriber("/l22_aero_color/markers", ColorRectMarkerArray, self.markers_arr_clb)
+        self.circles_sub = rospy.Subscriber("/l22_aero_color/circles", ColorRectMarkerArray, self.circles_arr_clb)
         self.result = []
-
+        self.circles = []
+    
         self.coords_thread = threading.Thread(target=self.coords_thread_func)
         self.coords_thread.daemon = True
         # self.coords_thread.start()
@@ -180,6 +194,11 @@ class Recognition:
         # self.coordsFunc()
         #if len(self.result) > 0:
             #print("RES: \n " + "\n ".join(map(str, self.result)))
+
+    def circles_arr_clb(self, msg):
+        self.circles = []
+        for marker in msg.markers:
+            self.circles.append(self.transform_marker(marker, frame_to="aruco_map"))
 
     def image_callback(self, data):
         self.cv_image = cv2.resize(self.bridge.imgmsg_to_cv2(data, 'bgr8'), (320, 240))
@@ -227,6 +246,23 @@ class Recognition:
                 else:
                     coordinates[color].append(tempCoords)
         self.result = []
+        for i in range(len(self.circles)):
+            if self.circles[i].color not in coordinates:
+                color = circle_type_mapping[self.circles[i].color]
+            else:
+                color = self.circles[i].color
+            tempCoords = (self.circles[i].cx_map, self.circles[i].cy_map)
+            if tempCoords[0] < -1 or tempCoords[1] < -1: continue #DELETE IF NEEDED!
+            if len(coordinates[color]) == 0:
+                coordinates[color].append(tempCoords)
+            else:
+                for j in range(len(coordinates[color])):
+                    if self.distance(coordinates[color][j], tempCoords) <= TOLERANCE_COORDS:
+                        coordinates[color][j] = self.average(tempCoords, coordinates[color][j])
+                        break
+                else:
+                    coordinates[color].append(tempCoords)
+        self.circles = []
     def coords_thread_func(self):
         r = rospy.Rate(COORDS_UPDATE_RATE)
         while True:
@@ -238,22 +274,17 @@ class Recognition:
         '''
         Функция для распознавания QR-кодов
         '''
-        arr = []
-        for _ in range(3):
-            gray = cv2.cvtColor(self.cv_image, cv2.COLOR_BGR2GRAY)
-            barcodes = pyzbar.decode(gray)
-            for barcode in barcodes:
-                (x, y, w, h) = barcode.rect
-                self.barcodeData = barcode.data.decode("utf-8")
-                xc = x + w/2
-                yc = y + h/2
-                self.cv_image = cv2.circle(self.cv_image, (int(xc), int(yc)), 15, (0, 0, 0), 30)
-                arr.append(self.barcodeData)
-                self.qr_pub.publish(self.bridge.cv2_to_imgmsg(self.cv_image, 'bgr8'))
-            rospy.sleep(0.3)
-        if len(arr) == 0: return ['none']
-        return self.most_frequent(arr)
-    
+        gray = cv2.cvtColor(self.cv_image, cv2.COLOR_BGR2GRAY)
+        barcodes = pyzbar.decode(gray)
+        for barcode in barcodes:
+            (x, y, w, h) = barcode.rect
+            self.barcodeData = barcode.data.decode("utf-8")
+            xc = x + w/2
+            yc = y + h/2
+            self.cv_image = cv2.circle(self.cv_image, (int(xc), int(yc)), 15, (0, 0, 0), 30)
+            self.qr_pub.publish(self.bridge.cv2_to_imgmsg(self.cv_image, 'bgr8'))
+        return self.barcodeData
+        
 rc = Recognition()
 #rospy.spin()
 
@@ -262,7 +293,7 @@ rc = Recognition()
 z = 1.5
 FIELD_LENGTH = 3.9 #in meters
 deltaX = 0.5 #in meters
-deltaY = 0.3 #in meters
+deltaY = 0.4 #in meters
 betweenX = 3
 
 
@@ -270,7 +301,9 @@ betweenX = 3
 i, count = 0, 0
 points = []
 
-def getAdditionalPoints(coord1, coord2, parts):
+def getAdditionalPoints(coord1, coord2, parts, xyz=0):
+    if xyz:
+        return zip(np.linspace(coord1[0], coord2[0], parts + 1), np.linspace(coord1[1], coord2[1], parts + 1), np.linspace(coord1[2], coord2[2], parts + 1))
     return zip(np.linspace(coord1[0], coord2[0], parts + 1), np.linspace(coord1[1], coord2[1], parts + 1))
 
 while i <= FIELD_LENGTH:
@@ -294,18 +327,18 @@ while i <= FIELD_LENGTH:
 takeoff(z)
 navigate_wait(0, 0, 1, yaw = 3.14/2)
 
-qr = rc.waitDataQR()
+qrs = []
+qr = 'seed'
+zLower = 0.85
+
+for (x_new, y_new) in [(0, 0), (0.15, 0), (0.2, 0), (0.2, 0.15), (0.2, 0.2), (0, 0)]:
+    navigate_wait(x_new, y_new, zLower)
+    qrs.append(rc.waitDataQR())
+
+if len(qrs) > 0:
+    qr = rc.most_frequent(qrs)
+
 print(qr)
-
-
-if qr == 'seed':
-    landCoordinates = (0.15, 3.4)
-elif qr == 'water':
-    landCoordinates = (3.4, 0.15)
-else:
-    landCoordinates = (3.4, 3.4)
-
-
 
 navigate_wait(0, 0, z)
 
@@ -313,13 +346,13 @@ for point in points:
     navigate_wait(x=point[0], y=point[1], z=z)
     rc.coordsFunc()
 
-'''    
-landCoordinates = [(0.15, 3.4), (3.4, 0.15), (3.4, 3.4)]
+landCoordinate = coordinates[circle_type_mapping[qr]][0]
 
-for point in landCoordinates:
-    navigate_wait(point[0], point[1], z)
-    rospy.sleep(10)
-'''
+navigate_wait(landCoordinate[0], landCoordinate[1], z)
+if z > 1:
+    for (x_new, y_new, z_new) in list(getAdditionalPoints((landCoordinate[0], landCoordinate[1], z), (landCoordinate[0], landCoordinate[1], 1), betweenX, xyz = 1)):
+        navigate_wait(x_new, y_new, z_new)
+
 land()
 
 print('WRITING CSV WITH COORDINATES. PLEASE WAIT...')
@@ -333,6 +366,7 @@ with open('result_'+str(time())+'.csv', 'w') as f:
     writer.writerow(["Sector", "Type", "x", "y"])
     arr = []
     for key in coordinates:
+        if key in ['water_land', 'seed_land', 'pastures_land']: continue
         for j in range(len(coordinates[key])):
             x = coordinates[key][j][0]
             y = coordinates[key][j][1]
