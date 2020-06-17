@@ -133,7 +133,7 @@ def draw_cnts_colors(image, cnts, color_name, t = 1):
         if t:
             cv2.rectangle(image,(cX,cY-15),(cX+75,cY+5),(255,255,255),-1)
             cv2.putText(image, type_mapping[color_name], (cX, cY),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors_p_rgb[color_name], 2, cv2.LINE_AA)
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors_p_rgb[color_name], 1, cv2.LINE_AA)
         else:
             cv2.putText(image, color_name, (cX, cY),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors_p_rgb[color_name], 2, cv2.LINE_AA)
