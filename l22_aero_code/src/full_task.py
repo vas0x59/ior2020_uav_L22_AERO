@@ -1,5 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
+
+# Импорт библиотек
 import math
 import time
 import cv2
@@ -33,6 +35,7 @@ TOLERANCE_COORDS = 0.4 #in meters
 COORDS_UPDATE_RATE = 1
 # ARUCO_TELEM_RATE = 5
 
+# Словари для координат
 coordinates = {
     'water': [],
     'pastures': [],
@@ -63,26 +66,10 @@ circle_type_mapping = {
 
 rospy.init_node('flight')
 
+
+
+# создаем объекты прокси сервисов
 get_telemetry = rospy.ServiceProxy('get_telemetry', srv.GetTelemetry)
-
-
-# global_telem_body = get_telemetry_clever(frame_id="body")
-# global_telem_aruco = get_telemetry(frame_id="aruco_map")
-# global_telem_navigate_target = get_telemetry(frame_id="navigate_target")
-# def get_telem_thread_func():
-#     global global_telem_aruco, global_telem_navigate_target
-#     r2 = rospy.Rate(ARUCO_TELEM_RATE*2)
-#     while True:
-#         global_telem_aruco = get_telemetry(frame_id="aruco_map")
-#         r2.sleep()
-#         global_telem_navigate_target = get_telemetry(frame_id="navigate_target")
-#         r2.sleep()
-# get_telem_thread =  threading.Thread(target=get_telem_thread_func)
-# get_telem_thread.daemon = True
-# get_telem_thread.start()
-
-
-
 navigate = rospy.ServiceProxy('navigate', srv.Navigate)
 navigate_global = rospy.ServiceProxy('navigate_global', srv.NavigateGlobal)
 set_position = rospy.ServiceProxy('set_position', srv.SetPosition)
@@ -109,7 +96,6 @@ def navigate_aruco(x=0, y=0, z=0, yaw=float('nan'), speed=0.4,  floor=False):
     return navigate(x=x, y=y, z=z, yaw=yaw, speed=speed, frame_id='aruco_map')
 
 def get_telemetry_aruco():
-    # global global_telem_aruco
     '''
     Функция для получения телеметрии
     '''
@@ -127,7 +113,6 @@ def takeoff(z):
     navigate_aruco(x=telem.x, y=telem.y, z=z, speed=0.4, floor=True)
 
 def navigate_wait(x, y, z, yaw=float('nan'), speed=0.2, tolerance=0.13):
-    # global global_telem_navigate_target
     '''
     Фукнция для полета до точки с ожиданием долета до нее
     '''
@@ -177,8 +162,6 @@ class Recognition:
         self.coords_thread = threading.Thread(target=self.coords_thread_func)
         self.coords_thread.daemon = True
         # self.coords_thread.start()
-        
-        
 
     def transform_marker(self, marker, frame_to="aruco_map"):# -> ColorRectMarkerMap:
         cx_map = 0
@@ -188,20 +171,26 @@ class Recognition:
             marker.cx_cam, marker.cy_cam, marker.cz_cam, 0, "main_camera_optical", frame_to, listener)
         return ColorRectMarkerMap(color=marker.color, cx_map=cx_map, cy_map=cy_map, cz_map=cz_map)
 
-    def markers_arr_clb(self, msg):#: ColorRectMarkerArray):
+    def markers_arr_clb(self, msg):
+        '''
+        Функция для парсинга координат цветных маркеров
+        '''
         self.result = []
         for marker in msg.markers:
             self.result.append(self.transform_marker(marker, frame_to="aruco_map"))
-        # self.coordsFunc()
-        #if len(self.result) > 0:
-            #print("RES: \n " + "\n ".join(map(str, self.result)))
 
     def circles_arr_clb(self, msg):
+        '''
+        Функция для парсинга координат точек для посадки из топика
+        '''
         self.circles = []
         for marker in msg.markers:
             self.circles.append(self.transform_marker(marker, frame_to="aruco_map"))
 
     def image_callback(self, data):
+        '''
+        Функция для парсинга изображения из топика
+        '''
         self.cv_image = cv2.resize(self.bridge.imgmsg_to_cv2(data, 'bgr8'), (320, 240))
 
     def most_frequent(self, arr):
@@ -225,8 +214,8 @@ class Recognition:
     def coordsFunc(self):
         # global Z
         '''
+        Функция для усреднения координат цветных маркеров
         '''
-        # arr = [[color1, x1, y1, z1], [color2, x2, y2, z2]]
         global coordinates
         # Z = get_telemetry_aruco().z
         for i in range(len(self.result)):
@@ -264,6 +253,7 @@ class Recognition:
                 else:
                     coordinates[color].append(tempCoords)
         self.circles = []
+
     def coords_thread_func(self):
         r = rospy.Rate(COORDS_UPDATE_RATE)
         while True:
@@ -286,8 +276,8 @@ class Recognition:
             self.qr_pub.publish(self.bridge.cv2_to_imgmsg(self.cv_image, 'bgr8'))
         return self.barcodeData
         
+# Создание объекта класса для распознавания
 rc = Recognition()
-#rospy.spin()
 
 
 
@@ -303,10 +293,15 @@ i, count = 0, 0
 points = []
 
 def getAdditionalPoints(coord1, coord2, parts, xyz=0):
+    '''
+    Создание дополнительных точек между двумя данными
+    '''
     if xyz:
         return zip(np.linspace(coord1[0], coord2[0], parts + 1), np.linspace(coord1[1], coord2[1], parts + 1), np.linspace(coord1[2], coord2[2], parts + 1))
     return zip(np.linspace(coord1[0], coord2[0], parts + 1), np.linspace(coord1[1], coord2[1], parts + 1))
 
+
+# Создание массива с точками для дальнейшего полета по полю (полет по зиг-загу)
 while i <= FIELD_LENGTH:
     j = 0
     while j <= FIELD_LENGTH:
@@ -324,14 +319,16 @@ while i <= FIELD_LENGTH:
     i += deltaX
     count += 1
     
-
+# взлет
 takeoff(z)
 navigate_wait(0, 0, 1, yaw = 3.14/2)
 
+# распознавание qr-кода
 qrs = []
 qr = 'seed'
 zLower = 0.85
 
+# полет вокруг qr-кода для улучшения распознавания
 for (x_new, y_new) in [(0, 0), (0.15, 0), (0.2, 0), (0.2, 0.15), (0.2, 0.2), (0, 0)]:
     navigate_wait(x_new, y_new, zLower)
     qrs.append(rc.waitDataQR())
@@ -343,12 +340,15 @@ print(qr)
 
 navigate_wait(0, 0, z)
 
+# полет по полю
 for point in points:
     navigate_wait(x=point[0], y=point[1], z=z)
     rc.coordsFunc()
 
+# определение координат для посадки
 landCoordinate = coordinates[circle_type_mapping[qr]][0]
 
+# посадка
 navigate_wait(landCoordinate[0], landCoordinate[1], z)
 if z > 1:
     for (x_new, y_new, z_new) in list(getAdditionalPoints((landCoordinate[0], landCoordinate[1], z), (landCoordinate[0], landCoordinate[1], 1), betweenX, xyz = 1)):
@@ -359,6 +359,7 @@ land()
 print('WRITING CSV WITH COORDINATES. PLEASE WAIT...')
 print(coordinates)
 
+# Создание csv файла с координатами
 import csv
 from time import time
 
@@ -383,3 +384,4 @@ with open('result_'+str(time())+'.csv', 'w') as f:
     writer.writerows(arr)
 
 print('DONE')
+
