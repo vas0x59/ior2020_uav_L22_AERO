@@ -257,18 +257,18 @@ class Recognition:
 rc = Recognition()
 #rospy.spin()
 
+
+
 z = 1.5
-
-
-
-points = []
-
 FIELD_LENGTH = 3.9 #in meters
 deltaX = 0.5 #in meters
 deltaY = 0.3 #in meters
 betweenX = 3
 
+
+
 i, count = 0, 0
+points = []
 
 def getAdditionalPoints(coord1, coord2, parts):
     return zip(np.linspace(coord1[0], coord2[0], parts + 1), np.linspace(coord1[1], coord2[1], parts + 1))
@@ -295,22 +295,30 @@ takeoff(z)
 navigate_wait(0, 0, 1, yaw = 3.14/2)
 
 qr = rc.waitDataQR()
+print(qr)
+
+
 if qr == 'seed':
     landCoordinates = (0.15, 3.4)
 elif qr == 'water':
     landCoordinates = (3.4, 0.15)
 else:
     landCoordinates = (3.4, 3.4)
-print(qr)
+
+
 
 navigate_wait(0, 0, z)
 
 for point in points:
     navigate_wait(x=point[0], y=point[1], z=z)
-    
 
+'''    
+landCoordinates = [(0.15, 3.4), (3.4, 0.15), (3.4, 3.4)]
 
-navigate_wait(landCoordinates[0], landCoordinates[1], z)
+for point in landCoordinates:
+    navigate_wait(point[0], point[1], z)
+    rospy.sleep(10)
+'''
 land()
 
 print('WRITING CSV WITH COORDINATES. PLEASE WAIT...')
@@ -327,13 +335,13 @@ with open('result_'+str(time())+'.csv', 'w') as f:
         for j in range(len(coordinates[key])):
             x = coordinates[key][j][0]
             y = coordinates[key][j][1]
-            if x < LENGTH_POLE/2 and y < LENGTH_POLE/2:
+            if x < FIELD_LENGTH/2 and y < FIELD_LENGTH/2:
                 arr.append(['C', key, x, y])
-            elif x < LENGTH_POLE/2 and y >= LENGTH_POLE/2:
+            elif x < FIELD_LENGTH/2 and y >= FIELD_LENGTH/2:
                 arr.append(['A', key, x, y])
-            elif x >= LENGTH_POLE/2 and y < LENGTH_POLE/2:
+            elif x >= FIELD_LENGTH/2 and y < FIELD_LENGTH/2:
                 arr.append(['D', key, x, y])
-            elif x >= LENGTH_POLE/2 and y >= LENGTH_POLE/2:
+            elif x >= FIELD_LENGTH/2 and y >= FIELD_LENGTH/2:
                 arr.append(['B', key, x, y])
     arr.sort(key = lambda x: x[0])
     writer.writerows(arr)

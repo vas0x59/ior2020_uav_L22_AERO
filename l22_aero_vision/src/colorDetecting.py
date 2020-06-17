@@ -62,7 +62,7 @@ def most_frequent(arr):
 '''
 
 def get_coords():
-
+    pass
 
 def get_color_objs(image, hsv, color_params, dop_cp=[]):
     """
