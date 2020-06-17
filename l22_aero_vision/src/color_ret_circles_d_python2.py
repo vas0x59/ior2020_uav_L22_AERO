@@ -18,6 +18,7 @@ rospy.init_node('l22_aero_color_node', anonymous=True)
 bridge = CvBridge()
 
 markers_arr_pub = rospy.Publisher("/l22_aero_color/markers", ColorRectMarkerArray)
+circles_arr_pub = rospy.Publisher("/l22_aero_color/circles", ColorRectMarkerArray)
 image_pub = rospy.Publisher("/l22_aero_color/debug_img", Image)
 '''
 colors_p_hsv = {
@@ -57,8 +58,12 @@ MARKER_SIDE2_SIZE = 0.3 # in m
 OBJ_S_THRESH = 150
 OFFSET = 10 # pixels
 
+CIRCLE_R = 0.15
+
 objectPoint = np.array([(-MARKER_SIDE1_SIZE / 2, -MARKER_SIDE2_SIZE / 2, 0), (MARKER_SIDE1_SIZE / 2, -MARKER_SIDE2_SIZE / 2, 0), 
                         (MARKER_SIDE1_SIZE / 2, MARKER_SIDE2_SIZE / 2, 0), (-MARKER_SIDE1_SIZE / 2, MARKER_SIDE2_SIZE / 2, 0)])
+objectPoint_circles = np.array([(-CIRCLE_R, -CIRCLE_R, 0), (CIRCLE_R, -CIRCLE_R, 0), 
+                        (CIRCLE_R, CIRCLE_R, 0), (-CIRCLE_R, CIRCLE_R, 0)])
 # print("objectPoint shape:", objectPoint.shape)
 class ColorRect:
     def __init__(self, cx_img=0, cy_img=0, color="none", points_img=[]):
@@ -133,6 +138,33 @@ def get_color_rects(cnts, color_name, image_shape=(240, 320, 3)):
                 result.append(ColorRect(color=color_name, cx_img=cX, cy_img=cY, points_img=points_img))
     return result
 
+def get_color_rects_circles(cnts, color_name, image_shape=(240, 320, 3)):
+    result = []
+    circles = []
+    for cnt in cnts:
+        approx = cv2.approxPolyDP(cnt, 0.02 * cv2.arcLength(cnt, True), True)
+        rect = cv2.minAreaRect(cnt)
+        # print(rect)
+        if len(approx) == 4 and abs(1 - rect[1][0] / (rect[1][1] + 1e-7)) < 0.2:
+            points_img = np.array([np.array(p[0]) for p in approx]) # ?
+            if img_colision_check(points_img, OFFSET, image_shape=image_shape):
+                M = cv2.moments(cnt)
+                cX = int((M["m10"] / (M["m00"] + 1e-7)))
+                cY = int((M["m01"] / (M["m00"] + 1e-7)))
+                result.append(ColorRect(color=color_name, cx_img=cX, cy_img=cY, points_img=points_img))
+        elif len(approx) >= 4 and abs(1 - rect[1][0] / (rect[1][1] + 1e-7)) < 0.2 and color_name in ["green", "yellow", "blue"]:
+            # elp = cv2.fitEllipse(cnt)
+            box = cv2.boxPoints(rect)
+            box = np.int0(box)
+            points_img = box
+            if img_colision_check(points_img, OFFSET, image_shape=image_shape):
+                M = cv2.moments(cnt)
+                cX = int((M["m10"] / (M["m00"] + 1e-7)))
+                cY = int((M["m01"] / (M["m00"] + 1e-7)))
+                circles.append(ColorRect(color=color_name, cx_img=cX, cy_img=cY, points_img=points_img))
+    return result, circles
+
+
 def draw_cnts_colors(image, cnts, color_name, t = 1):
     for cnt in cnts:
         M = cv2.moments(cnt)
@@ -155,6 +187,19 @@ def draw_color_rect(image, cr, t = 1):
             cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors_p_rgb[cr.color], 2, cv2.LINE_AA)
     return image
 
+def draw_color_circle(image, cr, t = 1):
+    for i, p in enumerate(cr.points_img):
+        cv2.circle(image, tuple(p), 5, ((i+1)*(255//4), (i+1)*(255//4), (i+1)*(255//4)), -1)
+    cv2.circle(image, (cr.cx_img, cr.cy_img), 5, colors_p_rgb[cr.color], -1)
+    if t:
+        cv2.rectangle(image,(cr.cx_img,cr.cy_img-15),(cr.cx_img+75,cr.cy_img+5),(255,255,255),-1)
+        cv2.putText(image, "LANDING_ZONE", (cr.cx_img, cr.cy_img),
+            cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors_p_rgb[cr.color], 1, cv2.LINE_AA)
+    else:
+        cv2.putText(image, "LANDING_ZONE", (cr.cx_img, cr.cy_img),
+            cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors_p_rgb[cr.color], 2, cv2.LINE_AA)
+    return image
+
 def get_rect_pose(rect, op, cM, dC):
     # print("shapes", op.shape, rect.points_img.shape)
     retval, rvec, tvec = cv2.solvePnP(np.array(op, dtype="float64"), np.array(rect.points_img, dtype="float64"), cM, dC)
@@ -171,23 +216,33 @@ def img_clb(msg):
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
     result_in_img_frame = [] # ColorRect
+    circles_in_img_frame = []
     for c_name in ["blue", "yellow", "green", "red", "brown"]:
         cnts, d_img = get_color_objs(image, hsv, colors_p_hsv[c_name])
         draw_cnts_colors(out, cnts, c_name)
-        result_in_img_frame += get_color_rects(cnts, c_name)
+        # result_in_img_frame += get_color_rects(cnts, c_name)
+        k = get_color_rects_circles(cnts, c_name)
+        result_in_img_frame += k[0]
+        circles_in_img_frame += k[1]
     for i in result_in_img_frame:
         draw_color_rect(out, i)
+    for i in circles_in_img_frame:
+        draw_color_circle(out, i)
     # cv2.imshow("out", out)
     result = []
+    circles = []
     if has_cam_info:
         for r in result_in_img_frame:
             result.append(get_rect_pose(r, objectPoint, cameraMatrix, distCoeffs))
+        for c in circles_in_img_frame:
+            circles.append(get_rect_pose(c, objectPoint_circles, cameraMatrix, distCoeffs))
         if len(result) > 0:
             print("RES: \n " + "\n ".join(map(str, result)))
+        if len(circles) > 0:
+            print("circles: \n " + "\n ".join(map(str, circles)))
     # cv2.waitKey(1)
-
-    markers_arr = ColorRectMarkerArray(header=Header(stamp=rospy.Time.now(), frame_id="color_marker_cam"), markers=[r.toMsg() for r in result])
-    markers_arr_pub.publish(markers_arr)
+    markers_arr_pub.publish(ColorRectMarkerArray(header=Header(stamp=rospy.Time.now(), frame_id="color_marker_cam"), markers=[r.toMsg() for r in result]))
+    circles_arr_pub.publish(ColorRectMarkerArray(header=Header(stamp=rospy.Time.now(), frame_id="color_marker_cam"), markers=[r.toMsg() for r in circles]))
     image_pub.publish(bridge.cv2_to_imgmsg(out, "bgr8"))
 
 
