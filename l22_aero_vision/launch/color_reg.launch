@@ -1,6 +1,6 @@
 <launch>
     <node pkg="topic_tools" name="cam_throttle" type="throttle"
-        args="messages main_camera/image_raw 5.0 main_camera/image_raw_throttled"/>
+        args="messages main_camera/image_raw 9.0 main_camera/image_raw_throttled"/>
 
     <node pkg="l22_aero_vision" type="color_ret_circles_d_python2.py" name="l22_aero_vision_node" output="screen" clear_params="true">
         <remap from="image_raw" to="main_camera/image_raw_throttled"/>
