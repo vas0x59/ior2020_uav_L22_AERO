@@ -1,3 +1,6 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import numpy as np
 import rospy
 # import tf2_geometry_msgs
