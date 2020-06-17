@@ -26,7 +26,7 @@ colors_p_rgb = {
 markers_arr_pub = rospy.Publisher("/l22_aero_color/markers_viz", MarkerArray)
 circles_arr_pub = rospy.Publisher("/l22_aero_color/circles_viz", MarkerArray)
 
-def markers_arr_clb(msg: ColorRectMarkerArray):
+def markers_arr_clb(msg):
     result = []
     iddd = 0
     for mrk in msg.markers:
@@ -62,7 +62,7 @@ def markers_arr_clb(msg: ColorRectMarkerArray):
     markers_arr_pub.publish(MarkerArray(markers=result))
     # if len(result) > 0:
     #     print("RES: \n " + "\n ".join(map(str, result)))
-def circles_arr_clb(msg: ColorRectMarkerArray):
+def circles_arr_clb(msg):
     result = []
     iddd = 0
     for mrk in msg.markers:
