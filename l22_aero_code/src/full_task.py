@@ -161,7 +161,7 @@ class Recognition:
 
         self.coords_thread = threading.Thread(target=self.coords_thread_func)
         self.coords_thread.daemon = True
-        self.coords_thread.start()
+        # self.coords_thread.start()
         
         
 
@@ -174,7 +174,7 @@ class Recognition:
         return ColorRectMarkerMap(color=marker.color, cx_map=cx_map, cy_map=cy_map, cz_map=cz_map)
 
     def markers_arr_clb(self, msg):#: ColorRectMarkerArray):
-        # self.result = []
+        self.result = []
         for marker in msg.markers:
             self.result.append(self.transform_marker(marker, frame_to="aruco_map"))
         # self.coordsFunc()
@@ -311,6 +311,7 @@ navigate_wait(0, 0, z)
 
 for point in points:
     navigate_wait(x=point[0], y=point[1], z=z)
+    rc.coordsFunc()
 
 '''    
 landCoordinates = [(0.15, 3.4), (3.4, 0.15), (3.4, 3.4)]
