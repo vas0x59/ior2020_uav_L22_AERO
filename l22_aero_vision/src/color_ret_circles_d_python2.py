@@ -248,9 +248,9 @@ def img_clb(msg):
 
 
 image_sub = rospy.Subscriber(
-    "/main_camera/image_raw", Image, img_clb)
+    "image_raw", Image, img_clb)
 
 camera_info_sub = rospy.Subscriber(
-    "/main_camera/camera_info", CameraInfo, camera_info_clb)
+    "camera_info", CameraInfo, camera_info_clb)
 
 rospy.spin()
