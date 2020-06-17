@@ -55,6 +55,7 @@ type_mapping = {
 MARKER_SIDE1_SIZE = 0.3 # in m
 MARKER_SIDE2_SIZE = 0.3 # in m
 OBJ_S_THRESH = 150
+OFFSET = 10
 
 objectPoint = np.array([(-MARKER_SIDE1_SIZE / 2, -MARKER_SIDE2_SIZE / 2, 0), (MARKER_SIDE1_SIZE / 2, -MARKER_SIDE2_SIZE / 2, 0), 
                         (MARKER_SIDE1_SIZE / 2, MARKER_SIDE2_SIZE / 2, 0), (-MARKER_SIDE1_SIZE / 2, MARKER_SIDE2_SIZE / 2, 0)])
@@ -110,18 +111,26 @@ def get_color_objs(image, hsv, color_params):
     debug_out = cv2.bitwise_and(image, image, mask=mask)
     return cnts, debug_out
 
+def img_colision_check(pnts, offset, image_shape=(240, 320, 3)):
+    minx1 = pnts[:, 0].min() > offset
+    miny1 = pnts[:, 1].min() > offset
+    minx2 = image_shape[1] - pnts[:, 0].max() > offset
+    miny2 = image_shape[0] - pnts[:, 1].max() > offset
+    return minx1 and minx2 and miny1 and miny2
+
 def get_color_rects(cnts, color_name, image_shape=(240, 320, 3)):
     result = []
     for cnt in cnts:
-        approx = cv2.approxPolyDP(cnt, 0.08 * cv2.arcLength(cnt, True), True)
+        approx = cv2.approxPolyDP(cnt, 0.02 * cv2.arcLength(cnt, True), True)
         rect = cv2.minAreaRect(cnt)
-        print(rect)
-        if len(approx) == 4 and abs(1 - rect[1][0] / (rect[1][1] + 1e-7)) < 0.2 :
+        # print(rect)
+        if len(approx) == 4 and abs(1 - rect[1][0] / (rect[1][1] + 1e-7)) < 0.2:
             points_img = np.array([np.array(p[0]) for p in approx]) # ?
-            M = cv2.moments(cnt)
-            cX = int((M["m10"] / (M["m00"] + 1e-7)))
-            cY = int((M["m01"] / (M["m00"] + 1e-7)))
-            result.append(ColorRect(color=color_name, cx_img=cX, cy_img=cY, points_img=points_img))
+            if img_colision_check(points_img, OFFSET,image_shape=image_shape):
+                M = cv2.moments(cnt)
+                cX = int((M["m10"] / (M["m00"] + 1e-7)))
+                cY = int((M["m01"] / (M["m00"] + 1e-7)))
+                result.append(ColorRect(color=color_name, cx_img=cX, cy_img=cY, points_img=points_img))
     return result
 
 def draw_cnts_colors(image, cnts, color_name, t = 1):
@@ -130,19 +139,20 @@ def draw_cnts_colors(image, cnts, color_name, t = 1):
         cX = int((M["m10"] / (M["m00"] + 1e-7)))
         cY = int((M["m01"] / (M["m00"] + 1e-7)))
         cv2.drawContours(image, [cnt], -1, colors_p_rgb[color_name], 2)
-        if t:
-            cv2.rectangle(image,(cX,cY-15),(cX+75,cY+5),(255,255,255),-1)
-            cv2.putText(image, type_mapping[color_name], (cX, cY),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors_p_rgb[color_name], 1, cv2.LINE_AA)
-        else:
-            cv2.putText(image, color_name, (cX, cY),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors_p_rgb[color_name], 2, cv2.LINE_AA)
+        
     return image
 
-def draw_color_rect(image, cr):
+def draw_color_rect(image, cr, t = 1):
     for i, p in enumerate(cr.points_img):
         cv2.circle(image, tuple(p), 5, ((i+1)*(255//4), (i+1)*(255//4), (i+1)*(255//4)), -1)
     cv2.circle(image, (cr.cx_img, cr.cy_img), 5, colors_p_rgb[cr.color], -1)
+    if t:
+        cv2.rectangle(image,(cr.cx_img,cr.cy_img-15),(cr.cx_img+75,cr.cy_img+5),(255,255,255),-1)
+        cv2.putText(image, type_mapping[cr.color], (cr.cx_img, cr.cy_img),
+            cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors_p_rgb[cr.color], 1, cv2.LINE_AA)
+    else:
+        cv2.putText(image, cr.color, (cr.cx_img, cr.cy_img),
+            cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors_p_rgb[cr.color], 2, cv2.LINE_AA)
     return image
 
 def get_rect_pose(rect, op, cM, dC):
