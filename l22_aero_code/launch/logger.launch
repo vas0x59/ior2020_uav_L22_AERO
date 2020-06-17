@@ -1,0 +1,7 @@
+<launch>
+    <node pkg="rosbag" type="record" name="l22_aero_rosbag_record" output="screen"  args="
+        record -o /home/$(env USER)/LOG_all rosout /tf /tf_static /main_camera/camera_info 
+        /mavros/battery /mavros/rc/in 
+        /l22_aero_color/circles  /l22_aero_color/markers
+        /mavros/local_position/pose /aruco_map/pose"/>
+</launch>
