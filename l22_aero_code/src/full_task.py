@@ -318,7 +318,10 @@ while i <= FIELD_LENGTH:
         points += list(getAdditionalPoints((i, FIELD_LENGTH - j), (i + deltaX, FIELD_LENGTH-j), betweenX))
     i += deltaX
     count += 1
-    
+
+if points[-1][0] > FIELD_LENGTH:
+    points = points[:-1]
+
 # взлет
 takeoff(z)
 navigate_wait(0, 0, 1, yaw = 3.14/2)
