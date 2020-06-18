@@ -198,7 +198,7 @@ def draw_color_rect(image, cr, t = 1):
     """
     Отрисовка результата распознования маркеров
     """
-    for i, p in enumerate(cr.points_img):От
+    for i, p in enumerate(cr.points_img):
         cv2.circle(image, tuple(p), 5, ((i+1)*(255//4), (i+1)*(255//4), (i+1)*(255//4)), -1)
     cv2.circle(image, (cr.cx_img, cr.cy_img), 5, colors_p_rgb[cr.color], -1)
     if t:
