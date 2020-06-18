@@ -681,7 +681,7 @@ vr = VideoRecorder().start()
 
 z = 1.5
 FIELD_LENGTH = 3.23 #in meters
-deltaX = 0.5 #in meters
+deltaX = 0.9 #in meters
 deltaY = 0.4 #in meters
 betweenX = 3
 LANDING_B = 5
