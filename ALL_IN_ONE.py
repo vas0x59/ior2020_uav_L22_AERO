@@ -707,7 +707,9 @@ for (x_new, y_new) in [(0, 0), (0.15, 0), (0.2, 0), (0.2, 0.15), (0.2, 0.2), (0,
 if len(qrs) > 0:
     qr = rc.most_frequent(qrs)
 
-if qr == None: qr = 'seed'
+if qr == None: 
+    qr = 'seed'
+    print(".....")
 
 print(qr)
 
@@ -737,6 +739,7 @@ telem = get_telemetry_aruco()
 last = None
 
 landingPath = list(getAdditionalPoints((landCoordinate[0], landCoordinate[1], z), (landCoordinate[0], landCoordinate[1], 1), betweenX, xyz = 1))
+print(landingPath)
 j = 0
 print("756")
 markerType = circle_type_mapping[qr]
