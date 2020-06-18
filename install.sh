@@ -4,8 +4,6 @@ ZIP=".zip"
 cd ~
 mkdir -p ~/L22_DayTwo/src
 cd ~/L22_DayTwo/
-catkin_make
-source devel/setup.bash
 cp ~/$FILE_NAME$ZIP src
 cd src
 unzip -o $FILE_NAME$ZIP
