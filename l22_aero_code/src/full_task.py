@@ -344,6 +344,8 @@ for (x_new, y_new) in [(0, 0), (0.15, 0), (0.2, 0), (0.2, 0.15), (0.2, 0.2), (0,
 if len(qrs) > 0:
     qr = rc.most_frequent(qrs)
 
+if qr == None: qr = 'seed'
+
 print(qr)
 
 navigate_wait(0, 0, z)
