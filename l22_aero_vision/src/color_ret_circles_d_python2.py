@@ -38,7 +38,7 @@ colors_p_hsv = {
     'green': (np.array([28, 44, 20]), np.array([100, 255, 255])),
     'yellow': (np.array([14, 100, 104]), np.array([29, 255, 255])),
     'red': (np.array([151, 134, 99]), np.array([255, 243, 252])),
-    'brown': (np.array([5, 121, 67]), np.array([24, 255, 255]))
+    'brown': (np.array([6, 86, 99]), np.array([255, 243, 252]))
 }
 colors_p_rgb = {
     "yellow": [0,  200,  200],
