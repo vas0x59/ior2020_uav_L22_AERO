@@ -23,6 +23,9 @@ from cv_bridge            import CvBridge
 import sys
 import threading
 
+from mavros_msgs.srv import CommandBool
+arming = rospy.ServiceProxy('mavros/cmd/arming', CommandBool)
+
 sys.path.append('/home/dmitrii/catkin_ws/src/ior2020_uav_L22_AERO')
 sys.path.append('/home/pi/catkin_ws/src/ior2020_uav_L22_AERO')
 from l22_aero_vision.msg  import ColorRectMarker
@@ -357,7 +360,12 @@ if z > 1:
     for (x_new, y_new, z_new) in list(getAdditionalPoints((landCoordinate[0], landCoordinate[1], z), (landCoordinate[0], landCoordinate[1], 1), LANDING_B, xyz = 1)):
         navigate_wait(x_new, y_new, z_new)
 
+print("LAND")
 land()
+
+rospy.sleep(4)
+print("DISARM")
+arming(False)
 
 print('WRITING CSV WITH COORDINATES. PLEASE WAIT...')
 print(coordinates)
