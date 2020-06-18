@@ -11,7 +11,7 @@ from std_msgs.msg import Int32, Header, Float32
 from cv_bridge import CvBridge, CvBridgeError
 import cv2
 import numpy as np
-
+from threading import Thread
 import tf
 import tf2_ros
 # import tf2_geometry_msgs
@@ -80,9 +80,32 @@ def transform_xyz_yaw(x, y, z, yaw, framefrom, frameto, listener):
     return target_x, target_y, target_z, target_yaw
 
 
+class VideoRecorder:
+    def __init__(self):
+        self.fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        if not os.path.exists(os.environ['HOME']+"/L22_AERO_LOG"):
+            os.mkdir(os.environ['HOME']+"/L22_AERO_LOG")
+        self.UPDATE_RATE = 5
+        self.video_writer = cv2.VideoWriter(os.environ['HOME']+"/L22_AERO_LOG/LOG_IMAGE_RAW_real_drone.avi", self.fourcc, self.UPDATE_RATE, (320, 240))
+        self.image_raw_frame = np.zeros((240, 320, 3), dtype="uint8")
+        self.bridge = CvBridge()
+        self.image_sub = rospy.Subscriber("/main_camera/image_raw_throttled", Image, img_clb)
+        self.stopped = False
+    
+    def img_clb(self, msg):
+        self.image_raw_frame = self.bridge.imgmsg_to_cv2(msg, "bgr8")
 
+    def start(self):    
+        Thread(target=self.videowriter, args=()).start()
+        return self
 
+    def videowriter(self):
+        while not self.stopped:
+            self.video_writer.write(self.image_raw_frame)
 
+    def stop(self):
+        self.stopped = True
+        self.video_writer.release()
 
 
 
@@ -647,7 +670,7 @@ class Recognition:
         
 # Создание объекта класса для распознавания
 rc = Recognition()
-
+vr = VideoRecorder().start()
 
 
 z = 1.5
@@ -774,6 +797,7 @@ if z > 1:
 '''
 land()
 
+vr.stop()
 rospy.sleep(4)
 print("DISARM")
 arming(False)
