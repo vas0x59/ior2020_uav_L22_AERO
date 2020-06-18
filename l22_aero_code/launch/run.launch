@@ -1,5 +1,6 @@
 <launch>
     <include file="$(find l22_aero_vision)/launch/color_reg.launch" />
-    <include file="$(find l22_aero_code)/launch/full_task.launch" />
+    <!-- <include file="$(find l22_aero_code)/launch/full_task.launch" /> -->
+    <include file="$(find l22_aero_code)/launch/test_task.launch" />
     <include file="$(find l22_aero_code)/launch/logger.launch" />
 </launch>

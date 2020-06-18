@@ -1,0 +1,6 @@
+<launch>
+    <node pkg="l22_aero_code" type="test_task.py" name="l22_aero_full_task_node" output="screen" clear_params="true">
+        <remap from="image_raw" to="main_camera/image_raw_throttled"/>
+        <remap from="camera_info" to="main_camera/camera_info"/>
+    </node>
+</launch>
