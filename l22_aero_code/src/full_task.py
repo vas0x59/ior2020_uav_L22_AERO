@@ -372,13 +372,17 @@ last = None
 
 landingPath = list(getAdditionalPoints((landCoordinate[0], landCoordinate[1], z), (landCoordinate[0], landCoordinate[1], 1), betweenX, xyz = 1))
 j = 0
+markerType = circle_type_mapping[qr]
 while j < len(landingPath):
     circles_copy = list(rc.circles)
     if len(circles_copy) > 0:
         for i in range(len(circles_copy)):
-            if rc.distance((circles_copy[i].cx_map, circles_copy[i].cy_map), landCoordinate) <= 0.6:
+            if rc.distance((circles_copy[i].cx_map, circles_copy[i].cy_map), landCoordinate) <= 0.6 and circle_type_mapping[circles_copy[i].color] == markerType:
                 navigate_wait(circles_copy[i].cx_map, circles_copy[i].cy_map, landingPath[j][2])
                 last = list(circles_copy)
+                break
+        else:
+            circles_copy = []
         j += 1
     
     if len(circles_copy) == 0:
