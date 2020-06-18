@@ -90,7 +90,7 @@ class VideoRecorder:
         self.video_writer = cv2.VideoWriter(os.environ['HOME']+"/L22_AERO_LOG/LOG_IMAGE_RAW_real_drone.avi", self.fourcc, self.UPDATE_RATE, (320, 240))
         self.image_raw_frame = np.zeros((240, 320, 3), dtype="uint8")
         self.bridge = CvBridge()
-        self.image_sub = rospy.Subscriber("/main_camera/image_raw_throttled", Image, img_clb)
+        self.image_sub = rospy.Subscriber("/main_camera/image_raw_throttled", Image, self.img_clb)
         self.stopped = False
     
     def img_clb(self, msg):
