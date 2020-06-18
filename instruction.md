@@ -3,13 +3,20 @@
 
 - Скачайте архив с гугл диска нашей команды  
 - Подключитесь к Wi-Fi сети, которую раздает коптер (имеет название `CLEVER-XXXX`, где X - цифра)  
-- Скопируйте архив на Raspberry Pi с помощью программы FileZilla в папку `/home/pi/catkin_ws/src`  
+- Создайте новый workspace с любым названием:  
+`cd ~`  
+`mkdir -p ~/<название workspace'a>/src`  
+`cd ~/<название workspace'a>/`  
+`catkin_make`  
+`source devel/setup.bash`  
+- Скопируйте архив на Raspberry Pi с помощью программы FileZilla в папку `/home/pi/<название workspace'a>/src`  
 - Откройте страницу `http://192.168.11.1`  
 - Откройте веб-терминал `Open web terminal (Butterfly)` 
-- Разархивируйте архив с помощью команды:  
+- В папке `/home/pi/<название workspace'a>/src` разархивируйте архив с помощью команды:  
 `unzip -o <имя скаченного архива>`
-- В папке `/home/pi/catkin_ws` выполните следующие команды:  
+- В папке `/home/pi/<название workspace'a>` выполните следующую команды:  
 `catkin_make`  
+- А затем команду:  
 `source devel/setup.bash`  
 - Запустите код, используя следующую команду:  
 `roslaunch l22_aero_code run.launch`  
