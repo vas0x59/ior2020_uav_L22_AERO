@@ -752,9 +752,9 @@ for point in points:
         break
     '''
     navigate_wait(x=point[0], y=point[1], z=z, speed=0.4)
-    rospy.sleep(0.2)
+    rospy.sleep(0.3)
     rc.coordsFunc()
-    rospy.sleep(0.2)
+    rospy.sleep(0.3)
 print("739")
 
 # определение координат для посадки
