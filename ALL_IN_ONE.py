@@ -751,7 +751,7 @@ for point in points:
     if points.index(point) == int(len(points) // 4):
         break
     '''
-    navigate_wait(x=point[0], y=point[1], z=z)
+    navigate_wait(x=point[0], y=point[1], z=z, speed=0.4)
     rospy.sleep(0.2)
     rc.coordsFunc()
     rospy.sleep(0.2)
