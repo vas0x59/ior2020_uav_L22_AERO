@@ -584,6 +584,7 @@ class Recognition:
         '''
         self.markers_arr_clb(result_GLOBAL)
         self.circles_arr_clb(circles_GLOBAL)
+        print("GLOBAL",result_GLOBAL, circles_GLOBAL)
         # global coordinates
         # Z = get_telemetry_aruco().z
         for i in range(len(self.result)):
