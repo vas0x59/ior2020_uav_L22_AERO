@@ -101,8 +101,10 @@ class VideoRecorder:
         return self
 
     def videowriter(self):
+        r = rospy.Rate(self.UPDATE_RATE)
         while not self.stopped:
             self.video_writer.write(self.image_raw_frame)
+            r.sleep()
 
     def stop(self):
         self.stopped = True
