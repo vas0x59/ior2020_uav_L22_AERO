@@ -168,9 +168,9 @@ def get_color_rects_circles(cnts, color_name, image_shape=(240, 320, 3)):
 
 def draw_cnts_colors(image, cnts, color_name, t = 1):
     for cnt in cnts:
-        M = cv2.moments(cnt)
-        cX = int((M["m10"] / (M["m00"] + 1e-7)))
-        cY = int((M["m01"] / (M["m00"] + 1e-7)))
+        # M = cv2.moments(cnt)
+        # cX = int((M["m10"] / (M["m00"] + 1e-7)))
+        # cY = int((M["m01"] / (M["m00"] + 1e-7)))
         cv2.drawContours(image, [cnt], -1, colors_p_rgb[color_name], 2)
         
     return image
