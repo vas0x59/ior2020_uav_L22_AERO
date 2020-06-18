@@ -759,9 +759,9 @@ while j < len(landingPath):
     
     if len(circles_copy) == 0:
         if last == None:
-            navigate_wait(landCoordinate[0], landCoordinate[1], j)
+            navigate_wait(landCoordinate[0], landCoordinate[1], 1.5)
         else:
-            navigate_wait(circles_copy[-1].cx_map, circles_copy[-1].cy_map, j)
+            navigate_wait(circles_copy[-1].cx_map, circles_copy[-1].cy_map, 1.5)
 
     telem = get_telemetry_aruco()
 print("777")
