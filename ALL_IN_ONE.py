@@ -744,6 +744,7 @@ j = 0
 print("756")
 markerType = circle_type_mapping[qr]
 while j < len(landingPath):
+    print(rc.circles)
     circles_copy = list(rc.circles)
     if len(circles_copy) > 0:
         for i in range(len(circles_copy)):
