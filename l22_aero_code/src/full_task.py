@@ -330,12 +330,12 @@ if points[-1][0] > FIELD_LENGTH:
 
 # взлет
 takeoff(z)
-navigate_wait(0, 0, 1, yaw = 3.14/2)
+navigate_wait(0, 0, 1.2, yaw = 3.14/2)
 
 # распознавание qr-кода
 qrs = []
 qr = 'seed'
-zLower = 0.85
+zLower = 1.2
 
 # полет вокруг qr-кода для улучшения распознавания
 for (x_new, y_new) in [(0, 0), (0.15, 0), (0.2, 0), (0.2, 0.15), (0.2, 0.2), (0, 0)]:
