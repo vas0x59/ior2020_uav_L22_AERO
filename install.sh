@@ -4,10 +4,10 @@ ZIP=".zip"
 cd ~
 mkdir -p ~/L22_DayTwo/src
 cd ~/L22_DayTwo/
-cp ~/$FILE_NAME$ZIP src
+mv ~/$FILE_NAME$ZIP src
 cd src
 unzip -o $FILE_NAME$ZIP
 cd ../
 catkin_make
 source devel/setup.bash
-export PYTHON_PATH=$(pwd)/src/$FILE_NAME:$PYTHON_PATH
+export PYTHONPATH=$(pwd)/src/$FILE_NAME:$PYTHONPATH
