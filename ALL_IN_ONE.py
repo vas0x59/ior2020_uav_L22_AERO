@@ -11,7 +11,7 @@ from std_msgs.msg import Int32, Header, Float32
 from cv_bridge import CvBridge, CvBridgeError
 import cv2
 import numpy as np
-
+# import tf2
 import tf
 import tf2_ros
 # import tf2_geometry_msgs
@@ -532,8 +532,11 @@ class Recognition:
         cx_map = 0
         cy_map = 0
         cz_map = 0
-        cx_map, cy_map, cz_map, _ = transform_xyz_yaw(
-            marker.cx_cam, marker.cy_cam, marker.cz_cam, 0, "main_camera_optical", frame_to, listener)
+        try:
+            cx_map, cy_map, cz_map, _ = transform_xyz_yaw(
+                marker.cx_cam, marker.cy_cam, marker.cz_cam, 0, "main_camera_optical", frame_to, listener)
+        except (tf.LookupException, tf.ConnectivityException):
+            print("ARUCOARUCOARUCO")
         return ColorRectMarkerMap(color=marker.color, cx_map=cx_map, cy_map=cy_map, cz_map=cz_map)
 
     def markers_arr_clb(self, msg):
@@ -723,7 +726,9 @@ for point in points:
         break
     '''
     navigate_wait(x=point[0], y=point[1], z=z)
+    rospy.sleep(0.2)
     rc.coordsFunc()
+    rospy.sleep(0.2)
 print("739")
 
 # определение координат для посадки
