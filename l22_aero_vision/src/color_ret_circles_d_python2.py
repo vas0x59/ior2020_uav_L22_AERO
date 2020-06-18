@@ -59,12 +59,12 @@ type_mapping = {
 }
 
 # Размеры цветных маркеров 
-MARKER_SIDE1_SIZE = 0.3 # in m
-MARKER_SIDE2_SIZE = 0.3 # in m
+MARKER_SIDE1_SIZE = 0.35 # in m
+MARKER_SIDE2_SIZE = 0.35 # in m
 OBJ_S_THRESH = 150
 OFFSET = 10 # pixels
 
-CIRCLE_R = 0.15
+CIRCLE_R = 0.2
 
 objectPoint = np.array([(-MARKER_SIDE1_SIZE / 2, -MARKER_SIDE2_SIZE / 2, 0), (MARKER_SIDE1_SIZE / 2, -MARKER_SIDE2_SIZE / 2, 0), 
                         (MARKER_SIDE1_SIZE / 2, MARKER_SIDE2_SIZE / 2, 0), (-MARKER_SIDE1_SIZE / 2, MARKER_SIDE2_SIZE / 2, 0)])
