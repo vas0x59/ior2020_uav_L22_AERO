@@ -288,7 +288,7 @@ rc = Recognition()
 
 
 z = 1.5
-FIELD_LENGTH = 3.9 #in meters
+FIELD_LENGTH = 3.23 #in meters
 deltaX = 0.5 #in meters
 deltaY = 0.4 #in meters
 betweenX = 3
