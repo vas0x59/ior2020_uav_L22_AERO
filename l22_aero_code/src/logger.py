@@ -18,7 +18,7 @@ UPDATE_RATE = 5
 if not os.path.exists(os.environ['HOME']+"/L22_AERO_LOG"):
     os.mkdir(os.environ['HOME']+"/L22_AERO_LOG")
 
-video_writer = cv2.VideoWriter(os.environ['HOME']+"/L22_AERO_LOG/LOG_IMAGE_RAW_time_" + str(int(time.time())) + ".avi", fourcc, UPDATE_RATE, (320, 240))
+video_writer = cv2.VideoWriter(os.environ['HOME']+"/L22_AERO_LOG/LOG_IMAGE_RAW_real_drone.avi", fourcc, UPDATE_RATE, (320, 240))
 r = rospy.Rate(UPDATE_RATE)
 
 
