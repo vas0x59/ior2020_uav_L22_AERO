@@ -22,6 +22,7 @@ from pyzbar               import pyzbar
 from cv_bridge            import CvBridge
 import sys
 import threading
+import os
 
 from mavros_msgs.srv import CommandBool
 arming = rospy.ServiceProxy('mavros/cmd/arming', CommandBool)
@@ -411,10 +412,14 @@ print('WRITING CSV WITH COORDINATES. PLEASE WAIT...')
 print(coordinates)
 
 # Создание csv файла с координатами
+
+if not os.path.exists(os.environ['HOME']+"/L22_AERO_LOG"):
+    os.mkdir(os.environ['HOME']+"/L22_AERO_LOG")
+
 import csv
 from time import time
 
-with open('result_'+str(time())+'.csv', 'w') as f:
+with open(os.environ['HOME']+"/L22_AERO_LOG/" + 'result_'+str(time())+'.csv', 'w') as f:
     writer = csv.writer(f)
     writer.writerow(["Sector", "Type", "x", "y"])
     arr = []
