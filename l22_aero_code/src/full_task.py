@@ -136,10 +136,12 @@ def land():
     arming(False)
 
 class ColorRectMarkerMap:
-    def __init__(self, cx_map=0, cy_map=0, cz_map=0, color="none"):
+    def __init__(self, cx_map=0, cy_map=0, cz_map=0, cx_img=0, cy_img=0, color="none"):
         self.cx_map = cx_map
         self.cy_map = cy_map
         self.cz_map = cz_map
+        self.cx_img = cx_img
+        self.cy_img = cy_img
         self.color = color
     def __str__(self):
         return "color: {}\n  coords map: {} {} {}".format(self.color, str(self.cx_map), str(self.cy_map), str(self.cz_map))
@@ -348,19 +350,48 @@ navigate_wait(0, 0, z)
 
 # полет по полю
 for point in points:
+    '''
+    if points.index(point) == int(len(points) // 4):
+        break
+    '''
     navigate_wait(x=point[0], y=point[1], z=z)
     rc.coordsFunc()
+
 
 # определение координат для посадки
 landCoordinate = coordinates[circle_type_mapping[qr]][0]
 
 # посадка
 navigate_wait(landCoordinate[0], landCoordinate[1], z)
+
+telem = get_telemetry_aruco()
+
+last = None
+
+landingPath = list(getAdditionalPoints((landCoordinate[0], landCoordinate[1], z), (landCoordinate[0], landCoordinate[1], 1), betweenX, xyz = 1))
+j = 0
+while j < len(landingPath):
+    circles_copy = list(rc.circles)
+    if len(circles_copy) > 0:
+        for i in range(len(circles_copy)):
+            if rc.distance((circles_copy[i].cx_map, circles_copy[i].cy_map), landCoordinate) <= 0.6:
+                navigate_wait(circles_copy[i].cx_map, circles_copy[i].cy_map, landingPath[j][2])
+                last = list(circles_copy)
+        j += 1
+    
+    if len(circles_copy) == 0:
+        if last == None:
+            navigate_wait(landCoordinate[0], landCoordinate[1], j)
+        else:
+            navigate_wait(circles_copy[-1].cx_map, circles_copy[-1].cy_map, j)
+
+    telem = get_telemetry_aruco()
+
+'''
 if z > 1:
     for (x_new, y_new, z_new) in list(getAdditionalPoints((landCoordinate[0], landCoordinate[1], z), (landCoordinate[0], landCoordinate[1], 1), LANDING_B, xyz = 1)):
         navigate_wait(x_new, y_new, z_new)
-
-print("LAND")
+'''
 land()
 
 rospy.sleep(4)
