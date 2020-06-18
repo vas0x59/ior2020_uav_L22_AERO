@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# Импорт библиотек
 import math
 import rospy
 import time
@@ -11,7 +12,6 @@ from cv_bridge import CvBridge, CvBridgeError
 import cv2
 import numpy as np
 
-# import rospy
 import tf
 import tf2_ros
 # import tf2_geometry_msgs
@@ -26,13 +26,6 @@ import tf.transformations as t
 # from l22_aero_vision.msg import ColorRectMarker, ColorRectMarkerArray
 # import tf
 
-# Импорт библиотек
-import math
-import time
-import cv2
-import numpy as np
-import rospy
-import tf
 
 try:
     from clover           import srv
@@ -41,10 +34,8 @@ except:
 
 from std_srvs.srv         import Trigger
 from mavros_msgs.srv      import CommandBool
-from sensor_msgs.msg      import Image
 from std_msgs.msg         import String
 from pyzbar               import pyzbar
-from cv_bridge            import CvBridge
 import sys
 import threading
 import os
@@ -455,12 +446,6 @@ listener = tf.TransformListener()
 
 
 
-
-
-nav_broadcaster = tf.TransformBroadcaster()
-# tf_buffer = tf2_ros.Buffer()
-# tf_listener = tf2_ros.TransformListener(tf_buffer)
-listener = tf.TransformListener()
 
 ##### 
 
