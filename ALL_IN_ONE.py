@@ -736,23 +736,24 @@ for point in points:
     '''
     navigate_wait(x=point[0], y=point[1], z=z)
     rc.coordsFunc()
-
+print("739")
 
 # определение координат для посадки
 if len(coordinates[circle_type_mapping[qr]]) == 0:
     landCoordinate = (1, 1)
 else:
     landCoordinate = coordinates[circle_type_mapping[qr]][0]
-
+print("746")
 # посадка
 navigate_wait(landCoordinate[0], landCoordinate[1], z)
-
+print("749")
 telem = get_telemetry_aruco()
 
 last = None
 
 landingPath = list(getAdditionalPoints((landCoordinate[0], landCoordinate[1], z), (landCoordinate[0], landCoordinate[1], 1), betweenX, xyz = 1))
 j = 0
+print("756")
 markerType = circle_type_mapping[qr]
 while j < len(landingPath):
     circles_copy = list(rc.circles)
@@ -773,7 +774,7 @@ while j < len(landingPath):
             navigate_wait(circles_copy[-1].cx_map, circles_copy[-1].cy_map, j)
 
     telem = get_telemetry_aruco()
-
+print("777")
 '''
 if z > 1:
     for (x_new, y_new, z_new) in list(getAdditionalPoints((landCoordinate[0], landCoordinate[1], z), (landCoordinate[0], landCoordinate[1], 1), LANDING_B, xyz = 1)):
