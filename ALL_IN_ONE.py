@@ -11,11 +11,8 @@ from std_msgs.msg import Int32, Header, Float32
 from cv_bridge import CvBridge, CvBridgeError
 import cv2
 import numpy as np
-<<<<<<< HEAD
 from threading import Thread
-=======
 # import tf2
->>>>>>> 26f045129a1081eac6ec6218fe94f93c513bf5e4
 import tf
 import tf2_ros
 # import tf2_geometry_msgs
