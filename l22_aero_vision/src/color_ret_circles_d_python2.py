@@ -31,6 +31,8 @@ colors_p_hsv = {
 }
 '''
 
+
+# Параметры цвета маркеров
 colors_p_hsv = {
     'blue': (np.array([80, 121, 67]), np.array([180, 255, 255])),
     'green': (np.array([43, 121, 67]), np.array([80, 255, 255])),
@@ -46,6 +48,8 @@ colors_p_rgb = {
     "brown": [42, 42, 165]
 }
 
+
+# Формат вывода 
 type_mapping = {
     'blue': 'N2_water',
     'green': 'N2_pastures',
@@ -54,6 +58,7 @@ type_mapping = {
     'brown': 'N2_soil'
 }
 
+# Размеры цветных маркеров 
 MARKER_SIDE1_SIZE = 0.3 # in m
 MARKER_SIDE2_SIZE = 0.3 # in m
 OBJ_S_THRESH = 150
@@ -92,18 +97,23 @@ class ColorRectMarker_p:
     def __str__(self):
         return "color: {}\n  coords: {} {} {}".format(self.color, str(self.cx_cam), str(self.cy_cam), str(self.cz_cam))
 
+# Параметры камеры
 cameraMatrix = np.zeros((3, 3), dtype="float64")
 distCoeffs = np.zeros((8, 1), dtype="float64")
 has_cam_info = False
 def camera_info_clb(msg):
     global has_cam_info, cameraMatrix, distCoeffs 
     if not has_cam_info:
+        # конвертация параметров камеры из формата ROS в OpenCV
         has_cam_info = True
         distCoeffs = np.array(msg.D, dtype="float64")
         cameraMatrix = np.reshape(np.array(msg.K, dtype="float64"), (3, 3))
 
 
 def get_color_objs(image, hsv, color_params):
+    """
+    Обработка изображения для определенного цвета
+    """
     debug_out = image.copy()
 
     mask = cv2.inRange(hsv, color_params[0], color_params[1])
@@ -125,6 +135,9 @@ def img_colision_check(pnts, offset, image_shape=(240, 320, 3)):
     return minx1 and minx2 and miny1 and miny2
 
 def get_color_rects(cnts, color_name, image_shape=(240, 320, 3)):
+    """
+    Фильтрация контуров
+    """
     result = []
     for cnt in cnts:
         approx = cv2.approxPolyDP(cnt, 0.02 * cv2.arcLength(cnt, True), True)
@@ -140,6 +153,9 @@ def get_color_rects(cnts, color_name, image_shape=(240, 320, 3)):
     return result
 
 def get_color_rects_circles(cnts, color_name, image_shape=(240, 320, 3)):
+    """
+    Фильтрация контуров
+    """
     result = []
     circles = []
     for cnt in cnts:
@@ -167,6 +183,9 @@ def get_color_rects_circles(cnts, color_name, image_shape=(240, 320, 3)):
 
 
 def draw_cnts_colors(image, cnts, color_name, t = 1):
+    """
+    Отрисовка контуров на итоговом изображении
+    """
     for cnt in cnts:
         # M = cv2.moments(cnt)
         # cX = int((M["m10"] / (M["m00"] + 1e-7)))
@@ -176,7 +195,10 @@ def draw_cnts_colors(image, cnts, color_name, t = 1):
     return image
 
 def draw_color_rect(image, cr, t = 1):
-    for i, p in enumerate(cr.points_img):
+    """
+    Отрисовка результата распознования маркеров
+    """
+    for i, p in enumerate(cr.points_img):От
         cv2.circle(image, tuple(p), 5, ((i+1)*(255//4), (i+1)*(255//4), (i+1)*(255//4)), -1)
     cv2.circle(image, (cr.cx_img, cr.cy_img), 5, colors_p_rgb[cr.color], -1)
     if t:
@@ -189,6 +211,9 @@ def draw_color_rect(image, cr, t = 1):
     return image
 
 def draw_color_circle(image, cr, t = 1):
+    """
+    Отрисовка результата распознования зон посадки 
+    """
     for i, p in enumerate(cr.points_img):
         cv2.circle(image, tuple(p), 5, ((i+1)*(255//4), (i+1)*(255//4), (i+1)*(255//4)), -1)
     cv2.circle(image, (cr.cx_img, cr.cy_img), 5, colors_p_rgb[cr.color], -1)
@@ -202,6 +227,9 @@ def draw_color_circle(image, cr, t = 1):
     return image
 
 def get_rect_pose(rect, op, cM, dC):
+    """
+    Расчет позиции маркера относительно камеры
+    """
     # print("shapes", op.shape, rect.points_img.shape)
     retval, rvec, tvec = cv2.solvePnP(np.array(op, dtype="float64"), np.array(rect.points_img, dtype="float64"), cM, dC)
     return ColorRectMarker_p(cx_cam=tvec[0][0], cy_cam=tvec[1][0], cz_cam=tvec[2][0]).fromColorRect(rect)
@@ -242,6 +270,7 @@ def img_clb(msg):
         # if len(circles) > 0:
         #     print("circles: \n " + "\n ".join(map(str, circles)))
     # cv2.waitKey(1)
+    # Отправка результатов распознования 
     markers_arr_pub.publish(ColorRectMarkerArray(header=Header(stamp=rospy.Time.now(), frame_id="color_marker_cam"), markers=[r.toMsg() for r in result]))
     circles_arr_pub.publish(ColorRectMarkerArray(header=Header(stamp=rospy.Time.now(), frame_id="color_marker_cam"), markers=[r.toMsg() for r in circles]))
     image_pub.publish(bridge.cv2_to_imgmsg(out, "bgr8"))
