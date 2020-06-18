@@ -361,7 +361,10 @@ for point in points:
 
 
 # определение координат для посадки
-landCoordinate = coordinates[circle_type_mapping[qr]][0]
+if len(coordinates[circle_type_mapping[qr]]) == 0:
+    landCoordinate = (1, 1)
+else:
+    landCoordinate = coordinates[circle_type_mapping[qr]][0]
 
 # посадка
 navigate_wait(landCoordinate[0], landCoordinate[1], z)
