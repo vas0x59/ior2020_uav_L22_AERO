@@ -35,7 +35,7 @@ colors_p_hsv = {
 # Параметры цвета маркеров
 colors_p_hsv = {
     'blue': (np.array([80, 121, 67]), np.array([180, 255, 255])),
-    'green': (np.array([43, 121, 67]), np.array([80, 255, 255])),
+    'green': (np.array([28, 44, 20]), np.array([100, 255, 255])),
     'yellow': (np.array([15, 121, 67]), np.array([37, 255, 255])),
     'red': (np.array([0, 121, 67]), np.array([5, 255, 255])),
     'brown': (np.array([5, 121, 67]), np.array([24, 255, 255]))
