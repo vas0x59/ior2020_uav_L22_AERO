@@ -10,4 +10,4 @@ unzip -o $FILE_NAME$ZIP
 cd ../
 catkin_make
 source devel/setup.bash
-export PYTHONPATH=$(pwd)/src/$FILE_NAME:$PYTHONPATH
+export PYTHONPATH=$PYTHONPATH:$(pwd)/src/$FILE_NAME
