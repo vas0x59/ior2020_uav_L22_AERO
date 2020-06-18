@@ -286,7 +286,7 @@ FIELD_LENGTH = 3.9 #in meters
 deltaX = 0.5 #in meters
 deltaY = 0.4 #in meters
 betweenX = 3
-
+LANDING_B = 5
 
 
 i, count = 0, 0
@@ -354,7 +354,7 @@ landCoordinate = coordinates[circle_type_mapping[qr]][0]
 # посадка
 navigate_wait(landCoordinate[0], landCoordinate[1], z)
 if z > 1:
-    for (x_new, y_new, z_new) in list(getAdditionalPoints((landCoordinate[0], landCoordinate[1], z), (landCoordinate[0], landCoordinate[1], 1), betweenX, xyz = 1)):
+    for (x_new, y_new, z_new) in list(getAdditionalPoints((landCoordinate[0], landCoordinate[1], z), (landCoordinate[0], landCoordinate[1], 1), LANDING_B, xyz = 1)):
         navigate_wait(x_new, y_new, z_new)
 
 land()
