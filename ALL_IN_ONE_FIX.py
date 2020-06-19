@@ -591,7 +591,7 @@ class Recognition:
             else:
                 i = 0
                 while i < len(self.temporary):
-                    if self.distance((self.temporary[i].cx_cam, self.temporary[i].cy_cam), (marker.cx_cam, marker.cy_cam)) <= TOL:
+                    if self.distance((self.temporary[i].cx_map, self.temporary[i].cy_map), (marker.cx_map, marker.cy_map)) <= TOL:
                         self.circles.append(self.temporary[i])
                         del self.temporary[i]
                     i += 1
