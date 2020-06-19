@@ -798,7 +798,7 @@ if not os.path.exists(os.environ['HOME']+"/L22_AERO_LOG"):
     os.mkdir(os.environ['HOME']+"/L22_AERO_LOG")
 
 import csv
-from time import time
+# from time import time
 
 with open(os.environ['HOME']+"/L22_AERO_LOG/" + 'result.csv', 'w') as f:
     writer = csv.writer(f)
@@ -823,7 +823,7 @@ with open(os.environ['HOME']+"/L22_AERO_LOG/" + 'result.csv', 'w') as f:
     writer.writerow(['','','',''])
     writer.writerow(['','','',''])
     writer.writerow(['','','',''])
-    writer.writerow(['TIME:', str(time()), 'TIME:', str(time())])
+    writer.writerow(['TIME:', str(ttime.ime()), 'TIME:', str(time.time())])
 print('CSV SAVED')
 
 
