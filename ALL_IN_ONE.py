@@ -820,7 +820,7 @@ telem = get_telemetry_aruco()
 
 last = None
 
-Z_LAND = 0.85
+Z_LAND = 0.75
 
 landingPath = list(getAdditionalPoints((landCoordinate[0], landCoordinate[1], z), (landCoordinate[0], landCoordinate[1], Z_LAND), betweenX, xyz = 1))
 print(landingPath)
