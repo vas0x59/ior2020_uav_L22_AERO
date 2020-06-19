@@ -182,7 +182,7 @@ type_mapping_1 = {
 MARKER_SIDE1_SIZE = 0.35 # in m
 MARKER_SIDE2_SIZE = 0.35 # in m
 OBJ_S_THRESH = 150
-OFFSET = 10 # pixels
+OFFSET = [45, 35] # pixels
 
 CIRCLE_R = 0.2
 
@@ -248,29 +248,29 @@ def get_color_objs(image, hsv, color_params):
     return cnts, debug_out
 
 def img_colision_check(pnts, offset, image_shape=(240, 320, 3)):
-    minx1 = pnts[:, 0].min() > offset
-    miny1 = pnts[:, 1].min() > offset
-    minx2 = image_shape[1] - pnts[:, 0].max() > offset
-    miny2 = image_shape[0] - pnts[:, 1].max() > offset
+    minx1 = pnts[:, 0].min() > offset[0]
+    miny1 = pnts[:, 1].min() > offset[1]
+    minx2 = image_shape[1] - pnts[:, 0].max() > offset[0]
+    miny2 = image_shape[0] - pnts[:, 1].max() > offset[1]
     return minx1 and minx2 and miny1 and miny2
 
-def get_color_rects(cnts, color_name, image_shape=(240, 320, 3)):
-    """
-    Фильтрация контуров
-    """
-    result = []
-    for cnt in cnts:
-        approx = cv2.approxPolyDP(cnt, 0.02 * cv2.arcLength(cnt, True), True)
-        rect = cv2.minAreaRect(cnt)
-        # print(rect)
-        if len(approx) == 4 and abs(1 - rect[1][0] / (rect[1][1] + 1e-7)) < 0.2:
-            points_img = np.array([np.array(p[0]) for p in approx]) # ?
-            if img_colision_check(points_img, OFFSET,image_shape=image_shape):
-                M = cv2.moments(cnt)
-                cX = int((M["m10"] / (M["m00"] + 1e-7)))
-                cY = int((M["m01"] / (M["m00"] + 1e-7)))
-                result.append(ColorRect(color=color_name, cx_img=cX, cy_img=cY, points_img=points_img))
-    return result
+# def get_color_rects(cnts, color_name, image_shape=(240, 320, 3)):
+#     """
+#     Фильтрация контуров
+#     """
+#     result = []
+#     for cnt in cnts:
+#         approx = cv2.approxPolyDP(cnt, 0.02 * cv2.arcLength(cnt, True), True)
+#         rect = cv2.minAreaRect(cnt)
+#         # print(rect)
+#         if len(approx) == 4 and abs(1 - rect[1][0] / (rect[1][1] + 1e-7)) < 0.2:
+#             points_img = np.array([np.array(p[0]) for p in approx]) # ?
+#             if img_colision_check(points_img, OFFSET,image_shape=image_shape):
+#                 M = cv2.moments(cnt)
+#                 cX = int((M["m10"] / (M["m00"] + 1e-7)))
+#                 cY = int((M["m01"] / (M["m00"] + 1e-7)))
+#                 result.append(ColorRect(color=color_name, cx_img=cX, cy_img=cY, points_img=points_img))
+#     return result
 
 def get_color_rects_circles(cnts, color_name, image_shape=(240, 320, 3)):
     """
@@ -279,20 +279,24 @@ def get_color_rects_circles(cnts, color_name, image_shape=(240, 320, 3)):
     result = []
     circles = []
     for cnt in cnts:
-        approx = cv2.approxPolyDP(cnt, 0.02 * cv2.arcLength(cnt, True), True)
+        approx = cv2.approxPolyDP(cnt, 0.04 * cv2.arcLength(cnt, True), True)
         rect = cv2.minAreaRect(cnt)
+        box = cv2.boxPoints(rect)
+        box = np.int0(box)
+        box_area = cv2.contourArea(box)  + 1e-7
+        c_area = cv2.contourArea(cnt)  + 1e-7
         # print(rect)
-        if len(approx) == 4 and abs(1 - rect[1][0] / (rect[1][1] + 1e-7)) < 0.2:
-            points_img = np.array([np.array(p[0]) for p in approx]) # ?
+        if len(approx) == 4 and abs(1 - rect[1][0] / (rect[1][1] + 1e-7)) < 0.15 and abs( 1 - c_area / box_area) < 0.2:
+            # points_img = np.array([np.array(p[0]) for p in approx]) # ?
+            points_img = box
             if img_colision_check(points_img, OFFSET, image_shape=image_shape):
                 M = cv2.moments(cnt)
                 cX = int((M["m10"] / (M["m00"] + 1e-7)))
                 cY = int((M["m01"] / (M["m00"] + 1e-7)))
                 result.append(ColorRect(color=color_name, cx_img=cX, cy_img=cY, points_img=points_img))
-        elif len(approx) >= 4 and abs(1 - rect[1][0] / (rect[1][1] + 1e-7)) < 0.2 and color_name in ["green", "yellow", "blue"]:
+        elif len(approx) > 4 and abs(1 - rect[1][0] / (rect[1][1] + 1e-7)) < 0.2 and color_name in ["green", "yellow", "blue"]:
             # elp = cv2.fitEllipse(cnt)
-            box = cv2.boxPoints(rect)
-            box = np.int0(box)
+            
             points_img = box
             if img_colision_check(points_img, OFFSET, image_shape=image_shape):
                 M = cv2.moments(cnt)
@@ -323,12 +327,12 @@ def draw_color_rect(image, cr, t = 1):
     cv2.circle(image, (cr.cx_img, cr.cy_img), 5, colors_p_rgb[cr.color], -1)
     if t:
         cv2.rectangle(image,(cr.cx_img,cr.cy_img-15),(cr.cx_img+75,cr.cy_img+5),(255,255,255),-1)
-        cv2.putText(image, type_mapping_1[cr.color], (cr.cx_img, cr.cy_img),
+        cv2.putText(image, type_mapping[cr.color], (cr.cx_img, cr.cy_img),
             cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors_p_rgb[cr.color], 1, cv2.LINE_AA)
     else:
         cv2.putText(image, cr.color, (cr.cx_img, cr.cy_img),
             cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors_p_rgb[cr.color], 2, cv2.LINE_AA)
-    return image
+    return imag
 
 def draw_color_circle(image, cr, t = 1):
     """
