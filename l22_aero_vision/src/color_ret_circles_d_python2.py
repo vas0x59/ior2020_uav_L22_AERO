@@ -49,13 +49,22 @@ colors_p_hsv = {
 #     'brown': (np.array([0, 57, 34]), np.array([19, 253, 127]))
 # }
 
+# colors_p_hsv = {
+#     'green': (np.array([71, 86, 22]), np.array([88, 255, 255])),
+#     'yellow': (np.array([14, 75, 33]), np.array([37, 255, 255])),
+#     'blue': (np.array([94, 88, 63]), np.array([134, 255, 255])),
+#     'red': (np.array([136, 78, 102]), np.array([174, 255, 255])),
+#     'brown': (np.array([0, 81, 91]), np.array([10, 255, 255])),
+# }
+
 colors_p_hsv = {
     'green': (np.array([71, 86, 22]), np.array([88, 255, 255])),
     'yellow': (np.array([14, 75, 33]), np.array([37, 255, 255])),
     'blue': (np.array([94, 88, 63]), np.array([134, 255, 255])),
-    'red': (np.array([136, 78, 102]), np.array([174, 255, 255])),
+    'red': (np.array([155, 133, 100]), np.array([230, 255, 255])),
     'brown': (np.array([0, 81, 91]), np.array([10, 255, 255])),
 }
+
 
 colors_p_rgb = {
     "yellow": [0,  200,  200],
@@ -183,15 +192,15 @@ def get_color_rects_circles(cnts, color_name, image_shape=(240, 320, 3)):
         box_area = cv2.contourArea(box)  + 1e-7
         c_area = cv2.contourArea(cnt)  + 1e-7
         # print(rect)
-        if len(approx) == 4 and abs(1 - rect[1][0] / (rect[1][1] + 1e-7)) < 0.15 and abs( 1 - c_area / box_area) < 0.2:
-            # points_img = np.array([np.array(p[0]) for p in approx]) # ?
-            points_img = box
+        if len(approx) == 4 and abs(1 - rect[1][0] / (rect[1][1] + 1e-7)) < 0.15 and abs(c_area / box_area) > 0.85:
+            points_img = np.array([np.array(p[0]) for p in approx]) # ?
+            # points_img = box
             if img_colision_check(points_img, OFFSET, image_shape=image_shape):
                 M = cv2.moments(cnt)
                 cX = int((M["m10"] / (M["m00"] + 1e-7)))
                 cY = int((M["m01"] / (M["m00"] + 1e-7)))
                 result.append(ColorRect(color=color_name, cx_img=cX, cy_img=cY, points_img=points_img))
-        elif len(approx) > 4 and abs(1 - rect[1][0] / (rect[1][1] + 1e-7)) < 0.2 and color_name in ["green", "yellow", "blue"]:
+        elif len(approx) > 4 and abs(1 - rect[1][0] / (rect[1][1] + 1e-7)) < 0.2 and color_name in ["green", "yellow", "blue"] and abs(c_area / box_area) < 0.8:
             # elp = cv2.fitEllipse(cnt)
             
             points_img = box
