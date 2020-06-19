@@ -823,7 +823,7 @@ with open(os.environ['HOME']+"/L22_AERO_LOG/" + 'result.csv', 'w') as f:
     writer.writerow(['','','',''])
     writer.writerow(['','','',''])
     writer.writerow(['','','',''])
-    writer.writerow(['TIME:', str(ttime.ime()), 'TIME:', str(time.time())])
+    writer.writerow(['TIME:', str(time.ime()), 'TIME:', str(time.time())])
 print('CSV SAVED')
 
 
