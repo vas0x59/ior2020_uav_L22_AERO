@@ -711,9 +711,9 @@ while i <= FIELD_LENGTH_X:
         j += deltaY
     d = j - FIELD_LENGTH_Y
     if d > 0: j -= d
-    if count % 2 == 0:
+    if count % 2 == 0 and i != len(points) - 1:
         points += list(getAdditionalPoints((i, j), (i + deltaX, j), betweenX))
-    else:
+    elif count % 2 != 0 and i != len(points) - 1:
         points += list(getAdditionalPoints((i, FIELD_LENGTH_Y - j), (i + deltaX, FIELD_LENGTH_Y-j), betweenX))
     i += deltaX
     count += 1
