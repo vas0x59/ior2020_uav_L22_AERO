@@ -764,7 +764,7 @@ for point in points:
     rc.coordsFunc()
     rospy.sleep(0.3)
 print("739")
-
+print(coordinates[circle_type_mapping[qr]])
 # определение координат для посадки
 if len(coordinates[circle_type_mapping[qr]]) == 0:
     landCoordinate = (1, 1)
