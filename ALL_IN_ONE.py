@@ -781,6 +781,41 @@ for (x_new, y_new) in list(getAdditionalPoints((telem.x, telem.y), landCoordinat
 
 navigate_wait(landCoordinate[0], landCoordinate[1], z)
 print("749")
+
+print('WRITING CSV WITH COORDINATES')
+print(coordinates)
+
+# Создание csv файла с координатами
+
+if not os.path.exists(os.environ['HOME']+"/L22_AERO_LOG"):
+    os.mkdir(os.environ['HOME']+"/L22_AERO_LOG")
+
+import csv
+from time import time
+
+with open(os.environ['HOME']+"/L22_AERO_LOG/" + 'result_'+str(time())+'.csv', 'w') as f:
+    writer = csv.writer(f)
+    writer.writerow(["Sector", "Type", "x", "y"])
+    arr = []
+    for key in coordinates:
+        if key in ['water_land', 'seed_land', 'pastures_land']: continue
+        for j in range(len(coordinates[key])):
+            x = coordinates[key][j][0]
+            y = coordinates[key][j][1]
+            if x < FIELD_LENGTH_X/2 and y < FIELD_LENGTH_Y/2:
+                arr.append(['C', key, x, y])
+            elif x < FIELD_LENGTH_X/2 and y >= FIELD_LENGTH_Y/2:
+                arr.append(['A', key, x, y])
+            elif x >= FIELD_LENGTH_X/2 and y < FIELD_LENGTH_Y/2:
+                arr.append(['D', key, x, y])
+            elif x >= FIELD_LENGTH_X/2 and y >= FIELD_LENGTH_Y/2:
+                arr.append(['B', key, x, y])
+    arr.sort(key = lambda x: x[0])
+    writer.writerows(arr)
+
+print('CSV SAVED')
+
+
 telem = get_telemetry_aruco()
 
 last = None
@@ -816,47 +851,9 @@ while j < len(landingPath):
 
     telem = get_telemetry_aruco()
 print("777")
-'''
-if z > 1:
-    for (x_new, y_new, z_new) in list(getAdditionalPoints((landCoordinate[0], landCoordinate[1], z), (landCoordinate[0], landCoordinate[1], 1), LANDING_B, xyz = 1)):
-        navigate_wait(x_new, y_new, z_new)
-'''
 land()
 vr.stop()
 rospy.sleep(4)
 print("DISARM")
 arming(False)
-
-print('WRITING CSV WITH COORDINATES. PLEASE WAIT...')
-print(coordinates)
-
-# Создание csv файла с координатами
-
-if not os.path.exists(os.environ['HOME']+"/L22_AERO_LOG"):
-    os.mkdir(os.environ['HOME']+"/L22_AERO_LOG")
-
-import csv
-from time import time
-
-with open(os.environ['HOME']+"/L22_AERO_LOG/" + 'result_'+str(time())+'.csv', 'w') as f:
-    writer = csv.writer(f)
-    writer.writerow(["Sector", "Type", "x", "y"])
-    arr = []
-    for key in coordinates:
-        if key in ['water_land', 'seed_land', 'pastures_land']: continue
-        for j in range(len(coordinates[key])):
-            x = coordinates[key][j][0]
-            y = coordinates[key][j][1]
-            if x < FIELD_LENGTH_X/2 and y < FIELD_LENGTH_Y/2:
-                arr.append(['C', key, x, y])
-            elif x < FIELD_LENGTH_X/2 and y >= FIELD_LENGTH_Y/2:
-                arr.append(['A', key, x, y])
-            elif x >= FIELD_LENGTH_X/2 and y < FIELD_LENGTH_Y/2:
-                arr.append(['D', key, x, y])
-            elif x >= FIELD_LENGTH_X/2 and y >= FIELD_LENGTH_Y/2:
-                arr.append(['B', key, x, y])
-    arr.sort(key = lambda x: x[0])
-    writer.writerows(arr)
-
 print('DONE')
-
