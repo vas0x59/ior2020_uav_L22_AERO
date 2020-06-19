@@ -680,8 +680,9 @@ vr = VideoRecorder().start()
 
 
 z = 1.5
-FIELD_LENGTH = 2.7 #in meters
-deltaX = 0.9 #in meters
+FIELD_LENGTH_X = 2.83 #in meters
+FIELD_LENGTH_Y = 2.65 #in meters
+deltaX = 0.65 #in meters
 deltaY = 0.4 #in meters
 betweenX = 3
 LANDING_B = 5
@@ -700,15 +701,15 @@ def getAdditionalPoints(coord1, coord2, parts, xyz=0):
 
 
 # Создание массива с точками для дальнейшего полета по полю (полет по зиг-загу)
-while i <= FIELD_LENGTH:
+while i <= FIELD_LENGTH_X:
     j = 0.1
-    while j <= FIELD_LENGTH:
+    while j <= FIELD_LENGTH_Y:
         if count % 2 == 0:
             points.append((i, j))
         else:
             points.append((i, FIELD_LENGTH-j))
         j += deltaY
-    d = j - FIELD_LENGTH
+    d = j - FIELD_LENGTH - 0.08
     if d > 0: j -= d
     if count % 2 == 0:
         points += list(getAdditionalPoints((i, j), (i + deltaX, j), betweenX))
@@ -722,7 +723,7 @@ if points[-1][0] > FIELD_LENGTH:
 
 # взлет
 takeoff(z)
-navigate_wait(0.1, 0.1, 1.2, yaw = 3.14/2)
+navigate_wait(0.15, 0.1, 1.2, yaw = 3.14/2)
 
 # распознавание qr-кода
 qrs = []
@@ -730,7 +731,7 @@ qr = 'seed'
 zLower = 1.2
 
 # полет вокруг qr-кода для улучшения распознавания
-for (x_new, y_new) in [(0.1, 0.1), (0.15, 0), (0.25, 0), (0.2, 0.15), (0.2, 0.2), (0.1, 0.1)]:
+for (x_new, y_new) in [(0.15, 0.1), (0.23, 0), (0.25, 0), (0.23, 0.15), (0.2, 0.2), (0.15, 0.1)]:
     navigate_wait(x_new, y_new, zLower)
     qrs.append(rc.waitDataQR())
 
@@ -743,7 +744,7 @@ if qr == None:
 
 print(qr)
 
-navigate_wait(0.1, 0.1, z)
+navigate_wait(0.15, 0.1, z)
 
 # полет по полю
 for point in points:
