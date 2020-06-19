@@ -764,6 +764,12 @@ for point in points:
     rc.coordsFunc()
     rospy.sleep(0.3)
 print("739")
+
+for (x_new, y_new) in [(0.75*FIELD_LENGTH_X, 0.75*FIELD_LENGTH_Y), (0.75*FIELD_LENGTH_X, FIELD_LENGTH_Y/4), (FIELD_LENGTH_X/4, FIELD_LENGTH_Y/4), (FIELD_LENGTH_X/4, 0.75*FIELD_LENGTH_Y)]:
+    navigate_wait(x_new, y_new, 2.1)
+    rospy.sleep(1)
+
+    
 print(coordinates[circle_type_mapping[qr]])
 # определение координат для посадки
 if len(coordinates[circle_type_mapping[qr]]) == 0:
