@@ -724,15 +724,15 @@ if points[-1][0] > FIELD_LENGTH_X:
 
 # взлет
 takeoff(z)
-navigate_wait(0.15, 0.1, 1.2, yaw = 3.14/2)
+navigate_wait(0.15, 0.15, 1.2, yaw = 3.14/2)
 
 # распознавание qr-кода
 qrs = []
 qr = 'seed'
-zLower = 1.2
+zLower = 1.05
 
 # полет вокруг qr-кода для улучшения распознавания
-for (x_new, y_new) in [(0.15, 0.15), (0.23, 0.05), (0.25, 0.05), (0.23, 0.2), (0.2, 0.25), (0.15, 0.15)]:
+for (x_new, y_new) in [(0.12, 0.15), (0.18, 0.05), (0.20, 0.05), (0.23, 0.2), (0.2, 0.25), (0.15, 0.15)]:
     navigate_wait(x_new, y_new, zLower)
     qrs.append(rc.waitDataQR())
     rospy.sleep(0.55)
