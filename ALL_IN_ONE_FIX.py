@@ -586,11 +586,13 @@ class Recognition:
         # self.circles = []
         TOL = 0.5
         for marker in msg:
+            marker = self.transform_marker(marker, frame_to="aruco_map")
             if len(self.temporary) == 0:
-                self.temporary.append(self.transform_marker(marker, frame_to="aruco_map"))
+                self.temporary.append(marker)
             else:
                 i = 0
                 while i < len(self.temporary):
+                    print(self.temporary[i])
                     if self.distance((self.temporary[i].cx_map, self.temporary[i].cy_map), (marker.cx_map, marker.cy_map)) <= TOL:
                         self.circles.append(self.temporary[i])
                         del self.temporary[i]
