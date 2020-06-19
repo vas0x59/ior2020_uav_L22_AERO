@@ -132,17 +132,6 @@ bridge = CvBridge()
 # markers_arr_pub = rospy.Publisher("/l22_aero_color/markers", ColorRectMarkerArray)
 # circles_arr_pub = rospy.Publisher("/l22_aero_color/circles", ColorRectMarkerArray)
 image_pub = rospy.Publisher("/l22_aero_color/debug_img", Image)
-'''
-colors_p_hsv = {
-    "yellow": (np.array([8,  60,  60]), np.array([35,  255, 255])),
-    "red": (np.array([160, 80,  80]), np.array([255, 255, 255]), np.array([0, 80,  80]), np.array([8, 255, 255])),
-    "blue": (np.array([161,  56,  109]), np.array([181, 126, 151])),
-    "green": (np.array([90,  70,  70]), np.array([160, 255, 255])),
-    "brown": (np.array([160, 80,  80]), np.array([255, 255, 255]), np.array([0, 80,  80]), np.array([8, 255, 255]))
-}
-'''
-
-
 # Параметры цвета маркеров
 # colors_p_hsv = {
 #     'blue': (np.array([103, 47, 65]), np.array([150, 187, 172])),
