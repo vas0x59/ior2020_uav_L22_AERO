@@ -575,7 +575,7 @@ class Recognition:
         '''
         Функция для парсинга координат цветных маркеров
         '''
-        self.result = []
+        # self.result = []
         for marker in msg:
             self.result.append(self.transform_marker(marker, frame_to="aruco_map"))
 
@@ -583,7 +583,7 @@ class Recognition:
         '''
         Функция для парсинга координат точек для посадки из топика
         '''
-        self.circles = []
+        # self.circles = []
         for marker in msg:
             self.circles.append(self.transform_marker(marker, frame_to="aruco_map"))
 
