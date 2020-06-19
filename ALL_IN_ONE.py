@@ -140,12 +140,21 @@ image_pub = rospy.Publisher("/l22_aero_color/debug_img", Image)
 #     'red': (np.array([151, 134, 99]), np.array([255, 243, 252])),
 #     'brown': (np.array([6, 86, 99]), np.array([255, 243, 252]))
 # }
+'''
 colors_p_hsv = {
     'blue': (np.array([72, 121, 67]), np.array([180, 255, 255])),
     'green': (np.array([43, 121, 67]), np.array([116, 255, 255])),
     'yellow': (np.array([15, 121, 67]), np.array([37, 255, 255])),
     'red': (np.array([0, 121, 67]), np.array([5, 255, 255])),
     'brown': (np.array([5, 121, 67]), np.array([24, 255, 255]))
+}
+'''
+colors_p_hsv = {
+    'green': (np.array([71, 86, 22]), np.array([88, 255, 255])),
+    'yellow': (np.array([14, 75, 33]), np.array([37, 255, 255])),
+    'blue': (np.array([94, 95, 55]), np.array([132, 255, 255])),
+    'red': (np.array([168, 72, 61]), np.array([208, 255, 255])),
+    'brown': (np.array([0, 57, 34]), np.array([19, 253, 127]))
 }
 colors_p_rgb = {
     "yellow": [0,  200,  200],
