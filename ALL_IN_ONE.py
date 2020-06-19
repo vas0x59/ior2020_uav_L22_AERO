@@ -525,7 +525,7 @@ def land():
     Фунцкия для посадки
     '''
     land_serv()
-    rospy.sleep(2)
+    rospy.sleep(1.25)
     arming(False)
 
 class ColorRectMarkerMap:
