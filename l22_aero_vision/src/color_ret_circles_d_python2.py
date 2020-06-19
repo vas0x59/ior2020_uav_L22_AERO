@@ -33,13 +33,22 @@ colors_p_hsv = {
 
 
 # Параметры цвета маркеров
+# colors_p_hsv = {
+#     'blue': (np.array([103, 47, 65]), np.array([150, 187, 172])),
+#     'green': (np.array([28, 44, 20]), np.array([100, 255, 255])),
+#     'yellow': (np.array([14, 100, 104]), np.array([29, 255, 255])),
+#     'red': (np.array([151, 134, 99]), np.array([255, 243, 252])),
+#     'brown': (np.array([6, 86, 99]), np.array([255, 243, 252]))
+# }
+
 colors_p_hsv = {
-    'blue': (np.array([103, 47, 65]), np.array([150, 187, 172])),
-    'green': (np.array([28, 44, 20]), np.array([100, 255, 255])),
-    'yellow': (np.array([14, 100, 104]), np.array([29, 255, 255])),
-    'red': (np.array([151, 134, 99]), np.array([255, 243, 252])),
-    'brown': (np.array([6, 86, 99]), np.array([255, 243, 252]))
+    'green': (np.array([71, 86, 22]), np.array([88, 255, 255])),
+    'yellow': (np.array([14, 75, 33]), np.array([37, 255, 255])),
+    'blue': (np.array([94, 95, 55]), np.array([132, 255, 255])),
+    'red': (np.array([168, 72, 61]), np.array([208, 255, 255])),
+    'brown': (np.array([0, 57, 34]), np.array([19, 253, 127]))
 }
+
 colors_p_rgb = {
     "yellow": [0,  200,  200],
     "red": [0, 0, 255],
@@ -62,7 +71,7 @@ type_mapping = {
 MARKER_SIDE1_SIZE = 0.35 # in m
 MARKER_SIDE2_SIZE = 0.35 # in m
 OBJ_S_THRESH = 150
-OFFSET = 10 # pixels
+OFFSET = 35 # pixels
 
 CIRCLE_R = 0.2
 
@@ -134,23 +143,23 @@ def img_colision_check(pnts, offset, image_shape=(240, 320, 3)):
     miny2 = image_shape[0] - pnts[:, 1].max() > offset
     return minx1 and minx2 and miny1 and miny2
 
-def get_color_rects(cnts, color_name, image_shape=(240, 320, 3)):
-    """
-    Фильтрация контуров
-    """
-    result = []
-    for cnt in cnts:
-        approx = cv2.approxPolyDP(cnt, 0.02 * cv2.arcLength(cnt, True), True)
-        rect = cv2.minAreaRect(cnt)
-        # print(rect)
-        if len(approx) == 4 and abs(1 - rect[1][0] / (rect[1][1] + 1e-7)) < 0.2:
-            points_img = np.array([np.array(p[0]) for p in approx]) # ?
-            if img_colision_check(points_img, OFFSET,image_shape=image_shape):
-                M = cv2.moments(cnt)
-                cX = int((M["m10"] / (M["m00"] + 1e-7)))
-                cY = int((M["m01"] / (M["m00"] + 1e-7)))
-                result.append(ColorRect(color=color_name, cx_img=cX, cy_img=cY, points_img=points_img))
-    return result
+# def get_color_rects(cnts, color_name, image_shape=(240, 320, 3)):
+#     """
+#     Фильтрация контуров
+#     """
+#     result = []
+#     for cnt in cnts:
+#         approx = cv2.approxPolyDP(cnt, 0.05 * cv2.arcLength(cnt, True), True)
+#         rect = cv2.minAreaRect(cnt)
+#         # print(rect)
+#         if len(approx) == 4 and abs(1 - rect[1][0] / (rect[1][1] + 1e-7)) < 0.2:
+#             points_img = np.array([np.array(p[0]) for p in approx]) # ?
+#             if img_colision_check(points_img, OFFSET,image_shape=image_shape):
+#                 M = cv2.moments(cnt)
+#                 cX = int((M["m10"] / (M["m00"] + 1e-7)))
+#                 cY = int((M["m01"] / (M["m00"] + 1e-7)))
+#                 result.append(ColorRect(color=color_name, cx_img=cX, cy_img=cY, points_img=points_img))
+#     return result
 
 def get_color_rects_circles(cnts, color_name, image_shape=(240, 320, 3)):
     """
@@ -159,20 +168,24 @@ def get_color_rects_circles(cnts, color_name, image_shape=(240, 320, 3)):
     result = []
     circles = []
     for cnt in cnts:
-        approx = cv2.approxPolyDP(cnt, 0.02 * cv2.arcLength(cnt, True), True)
+        approx = cv2.approxPolyDP(cnt, 0.04 * cv2.arcLength(cnt, True), True)
         rect = cv2.minAreaRect(cnt)
+        box = cv2.boxPoints(rect)
+        box = np.int0(box)
+        box_area = cv2.contourArea(box)  + 1e-7
+        c_area = cv2.contourArea(cnt)  + 1e-7
         # print(rect)
-        if len(approx) == 4 and abs(1 - rect[1][0] / (rect[1][1] + 1e-7)) < 0.2:
-            points_img = np.array([np.array(p[0]) for p in approx]) # ?
+        if len(approx) == 4 and abs(1 - rect[1][0] / (rect[1][1] + 1e-7)) < 0.1 and abs( 1 - c_area / box_area) < 0.25:
+            # points_img = np.array([np.array(p[0]) for p in approx]) # ?
+            points_img = box
             if img_colision_check(points_img, OFFSET, image_shape=image_shape):
                 M = cv2.moments(cnt)
                 cX = int((M["m10"] / (M["m00"] + 1e-7)))
                 cY = int((M["m01"] / (M["m00"] + 1e-7)))
                 result.append(ColorRect(color=color_name, cx_img=cX, cy_img=cY, points_img=points_img))
-        elif len(approx) >= 4 and abs(1 - rect[1][0] / (rect[1][1] + 1e-7)) < 0.2 and color_name in ["green", "yellow", "blue"]:
+        elif len(approx) > 4 and abs(1 - rect[1][0] / (rect[1][1] + 1e-7)) < 0.2 and color_name in ["green", "yellow", "blue"]:
             # elp = cv2.fitEllipse(cnt)
-            box = cv2.boxPoints(rect)
-            box = np.int0(box)
+            
             points_img = box
             if img_colision_check(points_img, OFFSET, image_shape=image_shape):
                 M = cv2.moments(cnt)
@@ -231,7 +244,7 @@ def get_rect_pose(rect, op, cM, dC):
     Расчет позиции маркера относительно камеры
     """
     # print("shapes", op.shape, rect.points_img.shape)
-    retval, rvec, tvec = cv2.solvePnP(np.array(op, dtype="float64"), np.array(rect.points_img, dtype="float64"), cM, dC)
+    retval, rvec, tvec = cv2.solvePnP(np.array(op, dtype="float32"), np.array(rect.points_img, dtype="float32"), cM, dC)
     return ColorRectMarker_p(cx_cam=tvec[0][0], cy_cam=tvec[1][0], cz_cam=tvec[2][0]).fromColorRect(rect)
 
 def img_clb(msg):
@@ -242,8 +255,10 @@ def img_clb(msg):
     # image[:, :, 1] = np.clip(image[:, :, 1]*1.2, 0, 255)
     # image[:, :, 0] = np.clip(image[:, :, 0]*1.5, 0, 255)
     out = image.copy()
+    # image = cv2.medianBlur(image,3)
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-
+    
+    cv2.imshow("image", image)
     result_in_img_frame = [] # ColorRect
     circles_in_img_frame = []
     for c_name in ["blue", "yellow", "green", "red", "brown"]:
@@ -253,6 +268,7 @@ def img_clb(msg):
         k = get_color_rects_circles(cnts, c_name)
         result_in_img_frame += k[0]
         circles_in_img_frame += k[1]
+        cv2.imshow(c_name, d_img)
     for i in result_in_img_frame:
         draw_color_rect(out, i)
     for i in circles_in_img_frame:
@@ -274,6 +290,7 @@ def img_clb(msg):
     markers_arr_pub.publish(ColorRectMarkerArray(header=Header(stamp=rospy.Time.now(), frame_id="color_marker_cam"), markers=[r.toMsg() for r in result]))
     circles_arr_pub.publish(ColorRectMarkerArray(header=Header(stamp=rospy.Time.now(), frame_id="color_marker_cam"), markers=[r.toMsg() for r in circles]))
     image_pub.publish(bridge.cv2_to_imgmsg(out, "bgr8"))
+    cv2.waitKey(1)
 
 
 image_sub = rospy.Subscriber(
