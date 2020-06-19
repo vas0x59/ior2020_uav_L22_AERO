@@ -707,18 +707,18 @@ while i <= FIELD_LENGTH_X:
         if count % 2 == 0:
             points.append((i, j))
         else:
-            points.append((i, FIELD_LENGTH-j))
+            points.append((i, FIELD_LENGTH_Y-j))
         j += deltaY
-    d = j - FIELD_LENGTH - 0.08
+    d = j - FIELD_LENGTH_Y
     if d > 0: j -= d
     if count % 2 == 0:
         points += list(getAdditionalPoints((i, j), (i + deltaX, j), betweenX))
     else:
-        points += list(getAdditionalPoints((i, FIELD_LENGTH - j), (i + deltaX, FIELD_LENGTH-j), betweenX))
+        points += list(getAdditionalPoints((i, FIELD_LENGTH_Y - j), (i + deltaX, FIELD_LENGTH_Y-j), betweenX))
     i += deltaX
     count += 1
 
-if points[-1][0] > FIELD_LENGTH:
+if points[-1][0] > FIELD_LENGTH_X:
     points = points[:-1]
 
 # взлет
@@ -832,13 +832,13 @@ with open(os.environ['HOME']+"/L22_AERO_LOG/" + 'result_'+str(time())+'.csv', 'w
         for j in range(len(coordinates[key])):
             x = coordinates[key][j][0]
             y = coordinates[key][j][1]
-            if x < FIELD_LENGTH/2 and y < FIELD_LENGTH/2:
+            if x < FIELD_LENGTH_X/2 and y < FIELD_LENGTH_Y/2:
                 arr.append(['C', key, x, y])
-            elif x < FIELD_LENGTH/2 and y >= FIELD_LENGTH/2:
+            elif x < FIELD_LENGTH_X/2 and y >= FIELD_LENGTH_Y/2:
                 arr.append(['A', key, x, y])
-            elif x >= FIELD_LENGTH/2 and y < FIELD_LENGTH/2:
+            elif x >= FIELD_LENGTH_X/2 and y < FIELD_LENGTH_Y/2:
                 arr.append(['D', key, x, y])
-            elif x >= FIELD_LENGTH/2 and y >= FIELD_LENGTH/2:
+            elif x >= FIELD_LENGTH_X/2 and y >= FIELD_LENGTH_Y/2:
                 arr.append(['B', key, x, y])
     arr.sort(key = lambda x: x[0])
     writer.writerows(arr)
