@@ -41,12 +41,20 @@ colors_p_hsv = {
 #     'brown': (np.array([6, 86, 99]), np.array([255, 243, 252]))
 # }
 
+# colors_p_hsv = {
+#     'green': (np.array([71, 86, 22]), np.array([88, 255, 255])),
+#     'yellow': (np.array([14, 75, 33]), np.array([37, 255, 255])),
+#     'blue': (np.array([94, 95, 55]), np.array([132, 255, 255])),
+#     'red': (np.array([168, 72, 61]), np.array([208, 255, 255])),
+#     'brown': (np.array([0, 57, 34]), np.array([19, 253, 127]))
+# }
+
 colors_p_hsv = {
     'green': (np.array([71, 86, 22]), np.array([88, 255, 255])),
     'yellow': (np.array([14, 75, 33]), np.array([37, 255, 255])),
-    'blue': (np.array([94, 95, 55]), np.array([132, 255, 255])),
-    'red': (np.array([168, 72, 61]), np.array([208, 255, 255])),
-    'brown': (np.array([0, 57, 34]), np.array([19, 253, 127]))
+    'blue': (np.array([94, 88, 63]), np.array([134, 255, 255])),
+    'red': (np.array([136, 78, 102]), np.array([174, 255, 255])),
+    'brown': (np.array([0, 81, 91]), np.array([10, 255, 255])),
 }
 
 colors_p_rgb = {
@@ -71,7 +79,7 @@ type_mapping = {
 MARKER_SIDE1_SIZE = 0.35 # in m
 MARKER_SIDE2_SIZE = 0.35 # in m
 OBJ_S_THRESH = 150
-OFFSET = 35 # pixels
+OFFSET = [45, 35]
 
 CIRCLE_R = 0.2
 
@@ -137,10 +145,10 @@ def get_color_objs(image, hsv, color_params):
     return cnts, debug_out
 
 def img_colision_check(pnts, offset, image_shape=(240, 320, 3)):
-    minx1 = pnts[:, 0].min() > offset
-    miny1 = pnts[:, 1].min() > offset
-    minx2 = image_shape[1] - pnts[:, 0].max() > offset
-    miny2 = image_shape[0] - pnts[:, 1].max() > offset
+    minx1 = pnts[:, 0].min() > offset[0]
+    miny1 = pnts[:, 1].min() > offset[1]
+    minx2 = image_shape[1] - pnts[:, 0].max() > offset[0]
+    miny2 = image_shape[0] - pnts[:, 1].max() > offset[1]
     return minx1 and minx2 and miny1 and miny2
 
 # def get_color_rects(cnts, color_name, image_shape=(240, 320, 3)):
@@ -175,7 +183,7 @@ def get_color_rects_circles(cnts, color_name, image_shape=(240, 320, 3)):
         box_area = cv2.contourArea(box)  + 1e-7
         c_area = cv2.contourArea(cnt)  + 1e-7
         # print(rect)
-        if len(approx) == 4 and abs(1 - rect[1][0] / (rect[1][1] + 1e-7)) < 0.1 and abs( 1 - c_area / box_area) < 0.25:
+        if len(approx) == 4 and abs(1 - rect[1][0] / (rect[1][1] + 1e-7)) < 0.15 and abs( 1 - c_area / box_area) < 0.2:
             # points_img = np.array([np.array(p[0]) for p in approx]) # ?
             points_img = box
             if img_colision_check(points_img, OFFSET, image_shape=image_shape):
