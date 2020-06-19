@@ -78,8 +78,8 @@ type_mapping = {
 # Размеры цветных маркеров 
 MARKER_SIDE1_SIZE = 0.35 # in m
 MARKER_SIDE2_SIZE = 0.35 # in m
-OBJ_S_THRESH = 250
-OFFSET = [60, 35]
+OBJ_S_THRESH = 350
+OFFSET = [61, 35]
 
 CIRCLE_R = 0.2
 
