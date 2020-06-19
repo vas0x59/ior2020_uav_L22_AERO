@@ -273,6 +273,7 @@ def img_colision_check(pnts, offset, image_shape=(240, 320, 3)):
 #     return result
 
 def get_color_rects_circles(cnts, color_name, image_shape=(240, 320, 3)):
+    global OFFSET
     """
     Фильтрация контуров
     """
@@ -861,6 +862,38 @@ while j < len(landingPath):
 
     telem = get_telemetry_aruco()
 print("777")
+# LANDING SYSTEM
+print("markerType_LANDING", markerType)
+print("STAGE2")
+time_st = time.time()
+TIMEOUT_H = 1.8
+landing_update_rate = rospy.Rate(5)
+OFFSET = [20, 20] # pixels
+
+while (time.time() - time_st) < TIMEOUT_H:
+    markers = [i for i in circles_GLOBAL if circle_type_mapping[i.color] == markerType]
+    print(markers)
+    if len(markers) > 0:
+        marker = markers[0]
+        x_b, y_b, z_b, _ = transform_xyz_yaw(
+                marker.cx_cam, marker.cy_cam, marker.cz_cam, 0, "main_camera_optical", "body", listener)
+        # nav_broadcaster.sendTransform(
+        #     (x_b, y_b, z_b),
+        #     tf.transformations.quaternion_from_euler(0, 0, 0),
+        #     rospy.Time.now(),
+        #     "landing_target",
+        #     "body"
+        # )
+        rospy.sleep(0.1)
+        print(x_b, y_b, z_b)
+        
+        set_position(x=x_b, y=y_b, z=-0.2, frame_id="body")
+        if abs(z_b) < 0.3:
+            break
+    landing_update_rate.sleep()
+
+
+print("LANDDDDDDDDDDDDDDDD")
 land()
 vr.stop()
 rospy.sleep(4)
