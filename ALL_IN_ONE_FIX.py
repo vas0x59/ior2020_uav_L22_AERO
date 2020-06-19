@@ -793,7 +793,7 @@ for (x_new, y_new) in list(getAdditionalPoints((telem.x, telem.y), landCoordinat
 
 navigate_wait(landCoordinate[0], landCoordinate[1], z)
 print("749")
-
+print(coordinates[circle_type_mapping[qr]])
 print('WRITING CSV WITH COORDINATES')
 print(coordinates)
 
