@@ -645,17 +645,17 @@ class Recognition:
                 color = circle_type_mapping[self.circles[i].color]
             else:
                 color = self.circles[i].color
-            tempCoords = [self.circles[i].cx_map, self.circles[i].cy_map]#####################################
+            tempCoords = (self.circles[i].cx_map, self.circles[i].cy_map)
             if tempCoords[0] < -1 or tempCoords[1] < -1: continue #DELETE IF NEEDED!
             if len(coordinates[color]) == 0:
-                coordinates[color].append(list(tempCoords) + [1])##################################################
+                coordinates[color].append(tempCoords)
             else:
                 for j in range(len(coordinates[color])):
                     if self.distance(coordinates[color][j], tempCoords) <= TOLERANCE_COORDS:
-                        coordinates[color][j] = list(self.average(tempCoords, coordinates[color][j])) + [coordinates[color][j][2] + 1] ################################
+                        coordinates[color][j] = self.average(tempCoords, coordinates[color][j])
                         break
                 else:
-                    coordinates[color].append(list(tempCoords) + [1]) ###############################################################
+                    coordinates[color].append(tempCoords)
         self.circles = []
 
     def coords_thread_func(self):
@@ -770,7 +770,7 @@ if len(coordinates[circle_type_mapping[qr]]) == 0:
     landCoordinate = (1, 1)
     print("1, 1")
 else:
-    landCoordinate = max(coordinates[circle_type_mapping[qr]], key=lambda x: x[2])[:2] ###############################################################
+    landCoordinate = coordinates[circle_type_mapping[qr]][0]
     print("landCoordinate", landCoordinate)
 print("746")
 # посадка
