@@ -770,7 +770,9 @@ telem = get_telemetry_aruco()
 
 last = None
 
-landingPath = list(getAdditionalPoints((landCoordinate[0], landCoordinate[1], z), (landCoordinate[0], landCoordinate[1], 1), betweenX, xyz = 1))
+Z_LAND = 0.85
+
+landingPath = list(getAdditionalPoints((landCoordinate[0], landCoordinate[1], z), (landCoordinate[0], landCoordinate[1], Z_LAND), betweenX, xyz = 1))
 print(landingPath)
 j = 0
 print("756")
@@ -804,7 +806,6 @@ if z > 1:
         navigate_wait(x_new, y_new, z_new)
 '''
 land()
-
 vr.stop()
 rospy.sleep(4)
 print("DISARM")
