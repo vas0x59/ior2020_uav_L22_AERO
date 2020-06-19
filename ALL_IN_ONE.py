@@ -327,12 +327,12 @@ def draw_color_rect(image, cr, t = 1):
     cv2.circle(image, (cr.cx_img, cr.cy_img), 5, colors_p_rgb[cr.color], -1)
     if t:
         cv2.rectangle(image,(cr.cx_img,cr.cy_img-15),(cr.cx_img+75,cr.cy_img+5),(255,255,255),-1)
-        cv2.putText(image, type_mapping[cr.color], (cr.cx_img, cr.cy_img),
+        cv2.putText(image, type_mapping_1[cr.color], (cr.cx_img, cr.cy_img),
             cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors_p_rgb[cr.color], 1, cv2.LINE_AA)
     else:
         cv2.putText(image, cr.color, (cr.cx_img, cr.cy_img),
             cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors_p_rgb[cr.color], 2, cv2.LINE_AA)
-    return imag
+    return image
 
 def draw_color_circle(image, cr, t = 1):
     """
