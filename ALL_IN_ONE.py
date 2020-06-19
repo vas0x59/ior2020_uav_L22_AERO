@@ -776,7 +776,7 @@ print("746")
 # посадка
 
 telem = get_telemetry_aruco()
-for (x_new, y_new) in list(getAdditionalPoints((telem.x, telem.y), landCoordinate)):
+for (x_new, y_new) in list(getAdditionalPoints((telem.x, telem.y), landCoordinate, 3)):
     navigate_wait(x_new, y_new, z)
 
 navigate_wait(landCoordinate[0], landCoordinate[1], z)
