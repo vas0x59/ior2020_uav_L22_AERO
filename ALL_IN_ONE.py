@@ -629,7 +629,7 @@ class Recognition:
                 color = self.result[i].color
             # if (self.result[i].cz_map - Z) < Z_TOL:
             tempCoords = (self.result[i].cx_map, self.result[i].cy_map)
-            if tempCoords[0] < 0 or tempCoords[1] < 0: continue
+            if tempCoords[0] < -1.5 or tempCoords[1] < -1.5: continue
             if len(coordinates[color]) == 0:
                 coordinates[color].append(tempCoords)
             else:
