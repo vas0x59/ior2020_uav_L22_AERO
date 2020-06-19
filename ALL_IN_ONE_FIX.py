@@ -107,7 +107,7 @@ class VideoRecorder:
                 self.video_writer.write(self.image_raw_frame)
                 r.sleep()
         except KeyboardInterrupt:
-            video_writer.release()
+            self.video_writer.release()
             self.stopped = True
     def stop(self):
         self.stopped = True
