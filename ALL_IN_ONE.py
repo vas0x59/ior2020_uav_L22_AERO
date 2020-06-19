@@ -101,11 +101,14 @@ class VideoRecorder:
         return self
 
     def videowriter(self):
-        r = rospy.Rate(self.UPDATE_RATE)
-        while not self.stopped:
-            self.video_writer.write(self.image_raw_frame)
-            r.sleep()
-
+        try:
+            r = rospy.Rate(self.UPDATE_RATE)
+            while not self.stopped:
+                self.video_writer.write(self.image_raw_frame)
+                r.sleep()
+        except KeyboardInterrupt:
+            video_writer.release()
+            self.stopped = True
     def stop(self):
         self.stopped = True
         self.video_writer.release()
@@ -717,7 +720,7 @@ while i <= FIELD_LENGTH_X:
     count += 1
 
 if points[-1][0] > FIELD_LENGTH_X:
-    points = points[:-1]
+    points = points[:-3]
 
 # взлет
 takeoff(z)
@@ -732,6 +735,7 @@ zLower = 1.2
 for (x_new, y_new) in [(0.15, 0.15), (0.23, 0.05), (0.25, 0.05), (0.23, 0.2), (0.2, 0.25), (0.15, 0.15)]:
     navigate_wait(x_new, y_new, zLower)
     qrs.append(rc.waitDataQR())
+    rospy.sleep(0.55)
 
 if len(qrs) > 0:
     qr = rc.most_frequent(qrs)
@@ -759,8 +763,10 @@ print("739")
 # определение координат для посадки
 if len(coordinates[circle_type_mapping[qr]]) == 0:
     landCoordinate = (1, 1)
+    print("1, 1")
 else:
     landCoordinate = coordinates[circle_type_mapping[qr]][0]
+    print("landCoordinate", landCoordinate)
 print("746")
 # посадка
 navigate_wait(landCoordinate[0], landCoordinate[1], z)
@@ -777,6 +783,7 @@ j = 0
 print("756")
 markerType = circle_type_mapping[qr]
 while j < len(landingPath):
+    print(i, j)
     rc.markers_arr_clb(result_GLOBAL)
     rc.circles_arr_clb(circles_GLOBAL)
     print(rc.circles)
