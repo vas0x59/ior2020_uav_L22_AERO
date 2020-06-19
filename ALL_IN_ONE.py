@@ -689,7 +689,7 @@ z = 1.5
 FIELD_LENGTH_X = 2.83 #in meters
 FIELD_LENGTH_Y = 2.65 #in meters
 deltaX = 0.65 #in meters
-deltaY = 0.4 #in meters
+deltaY = 0.25 #in meters
 betweenX = 3
 LANDING_B = 5
 
@@ -774,6 +774,11 @@ else:
     print("landCoordinate", landCoordinate)
 print("746")
 # посадка
+
+telem = get_telemetry_aruco()
+for (x_new, y_new) in list(getAdditionalPoints((telem.x, telem.y), landCoordinate)):
+    navigate_wait(x_new, y_new, z)
+
 navigate_wait(landCoordinate[0], landCoordinate[1], z)
 print("749")
 telem = get_telemetry_aruco()
