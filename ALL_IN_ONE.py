@@ -812,7 +812,7 @@ with open(os.environ['HOME']+"/L22_AERO_LOG/" + 'result.csv', 'w') as f:
                 arr.append(['B', key, x, y])
     arr.sort(key = lambda x: x[0])
     writer.writerows(arr)
-
+    writer.writerow(['TIME:', str(time()), 'TIME:', str(time())])
 print('CSV SAVED')
 
 
