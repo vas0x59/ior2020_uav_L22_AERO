@@ -730,7 +730,7 @@ if points[-1][0] > FIELD_LENGTH_X:
 
 # взлет
 takeoff(z)
-navigate_wait(0.15, 0.15, 1.2, yaw = 3.14/2)
+navigate_wait(0.15, 0.15, 1.2)
 
 # распознавание qr-кода
 qrs = []
