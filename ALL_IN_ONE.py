@@ -831,7 +831,7 @@ telem = get_telemetry_aruco()
 
 last = None
 
-Z_LAND = 0.75
+Z_LAND = 0.82
 
 landingPath = list(getAdditionalPoints((landCoordinate[0], landCoordinate[1], z), (landCoordinate[0], landCoordinate[1], Z_LAND), betweenX, xyz = 1))
 print(landingPath)
@@ -866,7 +866,7 @@ print("777")
 print("markerType_LANDING", markerType)
 print("STAGE2")
 time_st = time.time()
-TIMEOUT_H = 1.8
+TIMEOUT_H = 2.1
 landing_update_rate = rospy.Rate(5)
 OFFSET = [20, 20] # pixels
 
@@ -884,10 +884,10 @@ while (time.time() - time_st) < TIMEOUT_H:
         #     "landing_target",
         #     "body"
         # )
-        rospy.sleep(0.1)
+        rospy.sleep(0.09)
         print(x_b, y_b, z_b)
         
-        set_position(x=x_b, y=y_b, z=-0.2, frame_id="body")
+        set_position(x=x_b, y=y_b, z=-0.11, frame_id="body")
         if abs(z_b) < 0.3:
             break
     landing_update_rate.sleep()
