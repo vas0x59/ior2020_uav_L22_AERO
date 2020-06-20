@@ -887,7 +887,7 @@ while (time.time() - time_st) < TIMEOUT_H:
         rospy.sleep(0.09)
         print(x_b, y_b, z_b)
         
-        set_position(x=x_b, y=y_b, z=-0.09, frame_id="body")
+        set_position(x=x_b, y=y_b, z=-0.11, frame_id="body")
         if abs(z_b) < 0.3:
             break
     landing_update_rate.sleep()
