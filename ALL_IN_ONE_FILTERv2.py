@@ -179,14 +179,14 @@ type_mapping_1 = {
 }
 
 # # Размеры цветных маркеров 
-# MARKER_SIDE1_SIZE = 0.35 # in m
-# MARKER_SIDE2_SIZE = 0.35 # in m
-# CIRCLE_R = 0.2
+MARKER_SIDE1_SIZE = 0.35 # in m
+MARKER_SIDE2_SIZE = 0.35 # in m
+CIRCLE_R = 0.2
 
 # Размеры цветных маркеров 
-MARKER_SIDE1_SIZE = 0.3 # in m
-MARKER_SIDE2_SIZE = 0.3 # in m
-CIRCLE_R = 0.15
+# MARKER_SIDE1_SIZE = 0.3 # in m
+# MARKER_SIDE2_SIZE = 0.3 # in m
+# CIRCLE_R = 0.15
 
 
 OBJ_S_THRESH = 350
