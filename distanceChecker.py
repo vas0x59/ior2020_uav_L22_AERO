@@ -1,7 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-d = {'water': [(0.8873134493642003, 1.2540822306141264), (0.12680818485758294, 2.784158016161086), (1.2556914291375354, 2.3942925156490116), (2.799334205169208, 2.793371710128687)], 'pastures': [], 'seed': [(0.4938548570852421, 2.404726109190621), (0.9034012490610992, 3.1646465144201708), (1.6555758637451992, 0.5821088577126128)], 'potato': [], 'soil': [(2.403254638234139, 0.5035148888594937)], 'water_land': [], 'seed_land': [[1.6343488134744035, 2.0689548225126213, 7]], 'pastures_land': []}
+#d = {'water': [(0.8873134493642003, 1.2540822306141264), (0.12680818485758294, 2.784158016161086), (1.2556914291375354, 2.3942925156490116), (2.799334205169208, 2.793371710128687)], 'pastures': [], 'seed': [(0.4938548570852421, 2.404726109190621), (0.9034012490610992, 3.1646465144201708), (1.6555758637451992, 0.5821088577126128)], 'potato': [], 'soil': [(2.403254638234139, 0.5035148888594937)], 'water_land': [], 'seed_land': [[1.6343488134744035, 2.0689548225126213, 7]], 'pastures_land': []}
+
+d = 
 
 field = {
     'seed': [(1.662, 0.528), (0.906, 3.174), (0.528, 2.418)],
@@ -14,7 +16,7 @@ field = {
     'soil': [(2.418, 2.04)]
 }
 
-
+TH = 1
 mapping = {
     'water': 'b',
     'pastures': 'g',
@@ -48,17 +50,19 @@ for key in d:
             min_ = 99999999999999
             for point in field[key]:
                 d = distance(m, (point[0], point[1]))
-                if d < min_:
+                if d < min_  and dist < TH:
                     min_ = d
-            deltas.append(min_)
+            if min_ != 99999999999999:
+                deltas.append(min_)
         else:
             # plt.plot(d[key][i][0], d[key][i][1], marker='o', color=mapping[key])
             min_ = 99999999999999
             for point in field[key]:
                 dist = distance(d[key][i], (point[0], point[1]))
-                if dist < min_:
+                if dist < min_ and dist < TH:
                     min_ = dist
-            deltas.append(min_)
+            if min_ != 99999999999999:
+                deltas.append(min_)
 
 print(sum(deltas)/len(deltas), max(deltas), min(deltas))   
 # plt.show()
