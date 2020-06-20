@@ -137,7 +137,7 @@ for key in d:
             for point in field[key]:
                 dist = distance(m, (point[0], point[1]))
                 if dist < min_  and dist < TH:
-                    min_ = d
+                    min_ = dist
             if min_ != 99999999999999:
                 deltas.append(min_)
         else:
