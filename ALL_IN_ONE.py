@@ -525,7 +525,7 @@ def land():
     Фунцкия для посадки
     '''
     land_serv()
-    rospy.sleep(0.913)
+    rospy.sleep(0.813)
     arming(False)
 
 class ColorRectMarkerMap:
@@ -766,9 +766,9 @@ for point in points:
     rospy.sleep(0.3)
 print("739")
 
-for (x_new, y_new) in [(0.75*FIELD_LENGTH_X, 0.75*FIELD_LENGTH_Y), (0.75*FIELD_LENGTH_X, FIELD_LENGTH_Y/4), (FIELD_LENGTH_X/4, FIELD_LENGTH_Y/4), (FIELD_LENGTH_X/4, 0.75*FIELD_LENGTH_Y)]:
-    navigate_wait(x_new, y_new, 2.1)
-    rospy.sleep(1)
+# for (x_new, y_new) in [(0.75*FIELD_LENGTH_X, 0.75*FIELD_LENGTH_Y), (0.75*FIELD_LENGTH_X, FIELD_LENGTH_Y/4), (FIELD_LENGTH_X/4, FIELD_LENGTH_Y/4), (FIELD_LENGTH_X/4, 0.75*FIELD_LENGTH_Y)]:
+#     navigate_wait(x_new, y_new, 2.1)
+#     rospy.sleep(1)
 
     
 print(coordinates[circle_type_mapping[qr]])
@@ -831,9 +831,9 @@ telem = get_telemetry_aruco()
 
 last = None
 
-Z_LAND = 0.82
+Z_LAND = 0.86
 
-landingPath = list(getAdditionalPoints((landCoordinate[0], landCoordinate[1], z), (landCoordinate[0], landCoordinate[1], Z_LAND), betweenX, xyz = 1))
+landingPath = list(getAdditionalPoints((landCoordinate[0], landCoordinate[1], z), (landCoordinate[0], landCoordinate[1], Z_LAND), 4, xyz = 1))
 print(landingPath)
 j = 0
 print("756")
@@ -866,8 +866,8 @@ print("777")
 print("markerType_LANDING", markerType)
 print("STAGE2")
 time_st = time.time()
-TIMEOUT_H = 2.8
-landing_update_rate = rospy.Rate(8)
+TIMEOUT_H = 2.913
+landing_update_rate = rospy.Rate(9)
 OFFSET = [18, 18] # pixels
 
 while (time.time() - time_st) < TIMEOUT_H:
@@ -884,10 +884,10 @@ while (time.time() - time_st) < TIMEOUT_H:
         #     "landing_target",
         #     "body"
         # )
-        rospy.sleep(0.085)
+        rospy.sleep(0.0913)
         print(x_b, y_b, z_b)
         
-        set_position(x=x_b, y=y_b, z=-0.08, frame_id="body")
+        set_position(x=x_b, y=y_b, z=-0.075, frame_id="body")
         if abs(z_b) < 0.2:
             break
     landing_update_rate.sleep()
@@ -896,7 +896,7 @@ while (time.time() - time_st) < TIMEOUT_H:
 print("LANDDDDDDDDDDDDDDDD")
 land()
 vr.stop()
-rospy.sleep(2)
+rospy.sleep(1.5)
 print("DISARM")
 arming(False)
 print('DONE')
