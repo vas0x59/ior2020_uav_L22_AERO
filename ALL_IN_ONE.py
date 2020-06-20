@@ -802,7 +802,7 @@ import csv
 
 with open(os.environ['HOME']+"/L22_AERO_LOG/" + 'result.csv', 'w') as f:
     writer = csv.writer(f)
-    writer.writerow(["Sector", "Type", "x", "y"])
+    writer.writerow(["Sector", "Type", "x (cm)", "y (cm)"])
     arr = []
     for key in coordinates:
         if key in ['water_land', 'seed_land', 'pastures_land']: continue
@@ -810,13 +810,13 @@ with open(os.environ['HOME']+"/L22_AERO_LOG/" + 'result.csv', 'w') as f:
             x = coordinates[key][j][0]
             y = coordinates[key][j][1]
             if x < FIELD_LENGTH_X/2 and y < FIELD_LENGTH_Y/2:
-                arr.append(['C', key, x, y])
+                arr.append(['C', key, x*100, y*100])
             elif x < FIELD_LENGTH_X/2 and y >= FIELD_LENGTH_Y/2:
-                arr.append(['A', key, x, y])
+                arr.append(['A', key, x*100, y*100])
             elif x >= FIELD_LENGTH_X/2 and y < FIELD_LENGTH_Y/2:
-                arr.append(['D', key, x, y])
+                arr.append(['D', key, x*100, y*100])
             elif x >= FIELD_LENGTH_X/2 and y >= FIELD_LENGTH_Y/2:
-                arr.append(['B', key, x, y])
+                arr.append(['B', key, x*100, y*100])
     arr.sort(key = lambda x: x[0])
     writer.writerows(arr)
     writer.writerow(['','','',''])
