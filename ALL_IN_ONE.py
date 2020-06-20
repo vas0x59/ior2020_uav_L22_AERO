@@ -525,7 +525,7 @@ def land():
     Фунцкия для посадки
     '''
     land_serv()
-    rospy.sleep(1.5)
+    rospy.sleep(0.913)
     arming(False)
 
 class ColorRectMarkerMap:
@@ -866,9 +866,9 @@ print("777")
 print("markerType_LANDING", markerType)
 print("STAGE2")
 time_st = time.time()
-TIMEOUT_H = 2.1
-landing_update_rate = rospy.Rate(5)
-OFFSET = [20, 20] # pixels
+TIMEOUT_H = 2.8
+landing_update_rate = rospy.Rate(8)
+OFFSET = [18, 18] # pixels
 
 while (time.time() - time_st) < TIMEOUT_H:
     markers = [i for i in circles_GLOBAL if circle_type_mapping[i.color] == markerType]
@@ -884,11 +884,11 @@ while (time.time() - time_st) < TIMEOUT_H:
         #     "landing_target",
         #     "body"
         # )
-        rospy.sleep(0.09)
+        rospy.sleep(0.085)
         print(x_b, y_b, z_b)
         
-        set_position(x=x_b, y=y_b, z=-0.11, frame_id="body")
-        if abs(z_b) < 0.3:
+        set_position(x=x_b, y=y_b, z=-0.08, frame_id="body")
+        if abs(z_b) < 0.2:
             break
     landing_update_rate.sleep()
 
@@ -896,7 +896,7 @@ while (time.time() - time_st) < TIMEOUT_H:
 print("LANDDDDDDDDDDDDDDDD")
 land()
 vr.stop()
-rospy.sleep(4)
+rospy.sleep(2)
 print("DISARM")
 arming(False)
 print('DONE')
