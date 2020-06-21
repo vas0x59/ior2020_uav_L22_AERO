@@ -531,7 +531,7 @@ def land():
     Фунцкия для посадки
     '''
     land_serv()
-    rospy.sleep(0.7913)
+    rospy.sleep(0.79)
     arming(False)
 
 class ColorRectMarkerMap:
@@ -839,9 +839,9 @@ telem = get_telemetry_aruco()
 
 last = None
 
-Z_LAND = 0.86713
+Z_LAND = 0.85
 
-landingPath = list(getAdditionalPoints((landCoordinate[0], landCoordinate[1], z), (landCoordinate[0], landCoordinate[1], Z_LAND), 4, xyz = 1))
+landingPath = list(getAdditionalPoints((landCoordinate[0], landCoordinate[1], z), (landCoordinate[0], landCoordinate[1], Z_LAND), 3, xyz = 1))
 print(landingPath)
 j = 0
 print("756")
@@ -855,7 +855,7 @@ while j < len(landingPath):
     if len(circles_copy) > 0:
         for i in range(len(circles_copy)):
             if rc.distance((circles_copy[i].cx_map, circles_copy[i].cy_map), landCoordinate) <= 0.6 and circle_type_mapping[circles_copy[i].color] == markerType:
-                navigate_wait(circles_copy[i].cx_map, circles_copy[i].cy_map, landingPath[j][2], tolerance=0.1813)
+                navigate_wait(circles_copy[i].cx_map, circles_copy[i].cy_map, landingPath[j][2], tolerance=0.15)
                 last = list(circles_copy)
                 break
         else:
@@ -874,8 +874,8 @@ print("777")
 print("markerType_LANDING", markerType)
 print("STAGE2")
 time_st = time.time()
-TIMEOUT_H = 3.013
-landing_update_rate = rospy.Rate(10)
+TIMEOUT_H = 2.85
+landing_update_rate = rospy.Rate(9)
 OFFSET = [2, 2] # pixels
 
 while (time.time() - time_st) < TIMEOUT_H:
@@ -892,10 +892,10 @@ while (time.time() - time_st) < TIMEOUT_H:
         #     "landing_target",
         #     "body"
         # )
-        rospy.sleep(0.08813)
+        rospy.sleep(0.087)
         print(x_b, y_b, z_b)
         
-        set_position(x=x_b, y=y_b, z=-0.07513, frame_id="body")
+        set_position(x=x_b, y=y_b, z=-0.076, frame_id="body")
         if abs(z_b) < 0.2:
             break
     landing_update_rate.sleep()
