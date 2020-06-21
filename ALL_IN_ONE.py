@@ -531,7 +531,7 @@ def land():
     Фунцкия для посадки
     '''
     land_serv()
-    rospy.sleep(0.813)
+    rospy.sleep(0.7913)
     arming(False)
 
 class ColorRectMarkerMap:
@@ -839,7 +839,7 @@ telem = get_telemetry_aruco()
 
 last = None
 
-Z_LAND = 0.86
+Z_LAND = 0.86713
 
 landingPath = list(getAdditionalPoints((landCoordinate[0], landCoordinate[1], z), (landCoordinate[0], landCoordinate[1], Z_LAND), 4, xyz = 1))
 print(landingPath)
@@ -855,7 +855,7 @@ while j < len(landingPath):
     if len(circles_copy) > 0:
         for i in range(len(circles_copy)):
             if rc.distance((circles_copy[i].cx_map, circles_copy[i].cy_map), landCoordinate) <= 0.6 and circle_type_mapping[circles_copy[i].color] == markerType:
-                navigate_wait(circles_copy[i].cx_map, circles_copy[i].cy_map, landingPath[j][2])
+                navigate_wait(circles_copy[i].cx_map, circles_copy[i].cy_map, landingPath[j][2], tolerance=0.1813)
                 last = list(circles_copy)
                 break
         else:
@@ -874,9 +874,9 @@ print("777")
 print("markerType_LANDING", markerType)
 print("STAGE2")
 time_st = time.time()
-TIMEOUT_H = 2.913
-landing_update_rate = rospy.Rate(9)
-OFFSET = [18, 18] # pixels
+TIMEOUT_H = 3.013
+landing_update_rate = rospy.Rate(10)
+OFFSET = [2, 2] # pixels
 
 while (time.time() - time_st) < TIMEOUT_H:
     markers = [i for i in circles_GLOBAL if circle_type_mapping[i.color] == markerType]
@@ -892,10 +892,10 @@ while (time.time() - time_st) < TIMEOUT_H:
         #     "landing_target",
         #     "body"
         # )
-        rospy.sleep(0.0913)
+        rospy.sleep(0.08813)
         print(x_b, y_b, z_b)
         
-        set_position(x=x_b, y=y_b, z=-0.075, frame_id="body")
+        set_position(x=x_b, y=y_b, z=-0.07513, frame_id="body")
         if abs(z_b) < 0.2:
             break
     landing_update_rate.sleep()
