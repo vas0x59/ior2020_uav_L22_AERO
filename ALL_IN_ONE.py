@@ -875,7 +875,7 @@ print("markerType_LANDING", markerType)
 print("STAGE2")
 time_st = time.time()
 TIMEOUT_H = 2.85
-landing_update_rate = rospy.Rate(9)
+landing_update_rate = rospy.Rate(3.7)
 OFFSET = [2, 2] # pixels
 
 while (time.time() - time_st) < TIMEOUT_H:
