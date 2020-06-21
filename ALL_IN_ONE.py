@@ -188,6 +188,7 @@ CIRCLE_R = 0.2
 # MARKER_SIDE2_SIZE = 0.3 # in m
 # CIRCLE_R = 0.15
 
+
 OBJ_S_THRESH = 350
 OFFSET = [61, 35] # pixels
 
@@ -616,7 +617,6 @@ class Recognition:
         Функция для определения средней точки
         '''
         return ((coord1[0] + coord2[0])/2, (coord1[1] + coord2[1])/2)
-
     def coordsFunc(self):
         global result_GLOBAL, circles_GLOBAL, coordinates
         # global Z
@@ -637,14 +637,15 @@ class Recognition:
             tempCoords = (self.result[i].cx_map, self.result[i].cy_map)
             if tempCoords[0] < -1.5 or tempCoords[1] < -1.5: continue
             if len(coordinates[color]) == 0:
-                coordinates[color].append(tempCoords)
+                coordinates[color].append(np.array([np.array(tempCoords)]))
             else:
                 for j in range(len(coordinates[color])):
-                    if self.distance(coordinates[color][j], tempCoords) <= TOLERANCE_COORDS:
-                        coordinates[color][j] = self.average(tempCoords, coordinates[color][j])
+                    # print(coordinates[color][j].mean(axis=0), tempCoords, "arr", coordinates[color][j])
+                    if self.distance(coordinates[color][j].mean(axis=0), tempCoords) <= TOLERANCE_COORDS:
+                        coordinates[color][j] = np.append(coordinates[color][j], np.array([tempCoords]), axis=0)
                         break
                 else:
-                    coordinates[color].append(tempCoords)
+                    coordinates[color].append(np.array([np.array(tempCoords)]))
         self.result = []
         for i in range(len(self.circles)):
             if self.circles[i].color not in coordinates:
@@ -654,14 +655,15 @@ class Recognition:
             tempCoords = [self.circles[i].cx_map, self.circles[i].cy_map]#####################################
             if tempCoords[0] < -1 or tempCoords[1] < -1: continue #DELETE IF NEEDED!
             if len(coordinates[color]) == 0:
-                coordinates[color].append(list(tempCoords) + [1])##################################################
+                coordinates[color].append(np.array([np.array(tempCoords)]))##################################################
             else:
                 for j in range(len(coordinates[color])):
-                    if self.distance(coordinates[color][j], tempCoords) <= TOLERANCE_COORDS:
-                        coordinates[color][j] = list(self.average(tempCoords, coordinates[color][j])) + [coordinates[color][j][2] + 1] ################################
+                    if self.distance(coordinates[color][j].mean(axis=0), tempCoords) <= TOLERANCE_COORDS:
+                        # coordinates[color][j] = list(self.average(tempCoords, coordinates[color][j])) + [coordinates[color][j][2] + 1] ################################
+                        coordinates[color][j] = np.append(coordinates[color][j], np.array([tempCoords]), axis=0)
                         break
                 else:
-                    coordinates[color].append(list(tempCoords) + [1]) ###############################################################
+                    coordinates[color].append(np.array([np.array(tempCoords)]))######coordinates[color].append(list(tempCoords) + [1]) #########################################################
         self.circles = []
 
     def coords_thread_func(self):
@@ -782,7 +784,7 @@ if len(coordinates[circle_type_mapping[qr]]) == 0:
     landCoordinate = (1, 1)
     print("1, 1")
 else:
-    landCoordinate = max(coordinates[circle_type_mapping[qr]], key=lambda x: x[2])[:2] ###############################################################
+    landCoordinate = max(coordinates[circle_type_mapping[qr]], key=len).mean(axis=0) ###############################################################
     print("landCoordinate", landCoordinate)
 print("746")
 # посадка
@@ -812,8 +814,9 @@ with open(os.environ['HOME']+"/L22_AERO_LOG/" + 'result.csv', 'w') as f:
     for key in coordinates:
         if key in ['water_land', 'seed_land', 'pastures_land']: continue
         for j in range(len(coordinates[key])):
-            x = coordinates[key][j][0]
-            y = coordinates[key][j][1]
+            point = coordinates[key][j].mean(axis=0)
+            x = point[0]
+            y = point[1]
             if x < FIELD_LENGTH_X/2 and y < FIELD_LENGTH_Y/2:
                 arr.append(['C', key, x*100, y*100])
             elif x < FIELD_LENGTH_X/2 and y >= FIELD_LENGTH_Y/2:
