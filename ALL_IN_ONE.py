@@ -807,7 +807,7 @@ if not os.path.exists(os.environ['HOME']+"/L22_AERO_LOG"):
 import csv
 # from time import time
 
-with open(os.environ['HOME']+"/L22_AERO_LOG/" + 'result.csv', 'w') as f:
+with open(os.environ['HOME']+"/L22_AERO_LOG/" + 'L22_AERO_result.csv', 'w') as f:
     writer = csv.writer(f)
     writer.writerow(["Sector", "Type", "x (cm)", "y (cm)"])
     arr = []
