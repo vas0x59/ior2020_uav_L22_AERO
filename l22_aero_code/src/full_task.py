@@ -32,7 +32,7 @@ sys.path.append('/home/pi/catkin_ws/src/ior2020_uav_L22_AERO')
 from l22_aero_vision.msg  import ColorMarker
 from l22_aero_vision.msg  import ColorMarkerArray
 from l22_aero_vision.src.tools.tf_tools import *
-
+import l22_aero_vision.srv 
 
 Z_TOL = 0.5
 TOLERANCE_COORDS = 0.4 #in meters
@@ -82,6 +82,7 @@ set_attitude = rospy.ServiceProxy('set_attitude', srv.SetAttitude)
 set_rates = rospy.ServiceProxy('set_rates', srv.SetRates)
 land_serv = rospy.ServiceProxy('land', Trigger)
 arming = rospy.ServiceProxy('mavros/cmd/arming', CommandBool)
+v_set_parametrs = rospy.ServiceProxy('/l22_aero_color/set_parametrs', l22_aero_vision.srv.SetParameters)
 
 nav_broadcaster = tf.TransformBroadcaster()
 # tf_buffer = tf2_ros.Buffer()

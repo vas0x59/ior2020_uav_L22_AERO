@@ -330,7 +330,7 @@ def set_parameters_f(msg):
     OBJ_S_THRESH = check_p(msg.obj_s_th, OBJ_S_THRESH)
     OFFSET[0] = check_p(msg.offset_w, OFFSET[0])
     OFFSET[1] = check_p(msg.offset_h, OFFSET[1])
-    return SetParametersResponse
+    return SetParametersResponse()
 
 rospy.Service('/l22_aero_color/set_parametrs', SetParameters, set_parameters_f)
 
