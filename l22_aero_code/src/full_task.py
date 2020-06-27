@@ -29,8 +29,8 @@ arming = rospy.ServiceProxy('mavros/cmd/arming', CommandBool)
 
 sys.path.append('/home/dmitrii/catkin_ws/src/ior2020_uav_L22_AERO')
 sys.path.append('/home/pi/catkin_ws/src/ior2020_uav_L22_AERO')
-from l22_aero_vision.msg  import ColorRectMarker
-from l22_aero_vision.msg  import ColorRectMarkerArray
+from l22_aero_vision.msg  import ColorMarker
+from l22_aero_vision.msg  import ColorMarkerArray
 from l22_aero_vision.src.tools.tf_tools import *
 
 
@@ -136,7 +136,7 @@ def land():
     rospy.sleep(5)
     arming(False)
 
-class ColorRectMarkerMap:
+class ColorMarkerMap:
     def __init__(self, cx_map=0, cy_map=0, cz_map=0, cx_img=0, cy_img=0, color="none"):
         self.cx_map = cx_map
         self.cy_map = cy_map
@@ -160,8 +160,8 @@ class Recognition:
         self.cv_image = np.zeros((240, 320, 3), dtype="uint8")
         self.image_sub = rospy.Subscriber('image_raw', Image, self.image_callback)
         self.qr_pub = rospy.Publisher('/qr_debug', Image, queue_size=1)
-        self.coords_sub = sub = rospy.Subscriber("/l22_aero_color/markers", ColorRectMarkerArray, self.markers_arr_clb)
-        self.circles_sub = rospy.Subscriber("/l22_aero_color/circles", ColorRectMarkerArray, self.circles_arr_clb)
+        self.coords_sub = sub = rospy.Subscriber("/l22_aero_color/markers", ColorMarkerArray, self.markers_arr_clb)
+        self.circles_sub = rospy.Subscriber("/l22_aero_color/circles", ColorMarkerArray, self.circles_arr_clb)
         self.result = []
         self.circles = []
     
@@ -169,13 +169,13 @@ class Recognition:
         self.coords_thread.daemon = True
         # self.coords_thread.start()
 
-    def transform_marker(self, marker, frame_to="aruco_map"):# -> ColorRectMarkerMap:
+    def transform_marker(self, marker, frame_to="aruco_map"):# -> ColorMarkerMap:
         cx_map = 0
         cy_map = 0
         cz_map = 0
         cx_map, cy_map, cz_map, _ = transform_xyz_yaw(
             marker.cx_cam, marker.cy_cam, marker.cz_cam, 0, "main_camera_optical", frame_to, listener)
-        return ColorRectMarkerMap(color=marker.color, cx_map=cx_map, cy_map=cy_map, cz_map=cz_map)
+        return ColorMarkerMap(color=marker.color, cx_map=cx_map, cy_map=cy_map, cz_map=cz_map)
 
     def markers_arr_clb(self, msg):
         '''

@@ -10,7 +10,7 @@ import threading
 
 sys.path.append('/home/dmitrii/catkin_ws/src/ior2020_uav_L22_AERO')
 sys.path.append('/home/pi/catkin_ws/src/ior2020_uav_L22_AERO')
-from l22_aero_vision.msg import ColorRectMarker, ColorRectMarkerArray
+from l22_aero_vision.msg import ColorMarker, ColorMarkerArray
 # from l22_aero_vision.src.tool
 from l22_aero_vision.src.tools.tf_tools import *
 from visualization_msgs.msg import Marker, MarkerArray
@@ -107,9 +107,9 @@ def circles_arr_clb(msg):
 
 
 sub = rospy.Subscriber(
-    "/l22_aero_color/markers", ColorRectMarkerArray, markers_arr_clb)
+    "/l22_aero_color/markers", ColorMarkerArray, markers_arr_clb)
 sub2 = rospy.Subscriber(
-    "/l22_aero_color/circles", ColorRectMarkerArray, circles_arr_clb)
+    "/l22_aero_color/circles", ColorMarkerArray, circles_arr_clb)
 
 # tf.transformations.
 

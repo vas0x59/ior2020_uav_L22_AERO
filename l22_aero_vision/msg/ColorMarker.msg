@@ -6,3 +6,4 @@ float32 cy_cam
 float32 cz_cam
 float32 size1
 float32 size2
+int16 type

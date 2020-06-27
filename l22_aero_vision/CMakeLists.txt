@@ -16,8 +16,8 @@ find_package(catkin REQUIRED COMPONENTS
 
 add_message_files(
   FILES
-  ColorRectMarker.msg
-  ColorRectMarkerArray.msg
+  ColorMarker.msg
+  ColorMarkerArray.msg
 )
 
 catkin_python_setup()
