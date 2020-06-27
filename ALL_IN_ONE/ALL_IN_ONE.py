@@ -24,7 +24,7 @@ from nav_msgs.msg import Odometry
 from std_msgs.msg import Float32, Int16, Bool
 from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3, TransformStamped, PoseStamped
 import tf.transformations as t
-# from l22_aero_vision.msg import ColorRectMarker, ColorRectMarkerArray
+# from l22_aero_vision.msg import ColorMarker, ColorMarkerArray
 # import tf
 
 
@@ -125,15 +125,15 @@ class VideoRecorder:
 
 
 
-result_GLOBAL = [] # ColorRectMarker_p
-circles_GLOBAL = [] # ColorRectMarker_p
+result_GLOBAL = [] # ColorMarker_p
+circles_GLOBAL = [] # ColorMarker_p
 
 
 rospy.init_node('l22_aero_color_node', anonymous=True)
 bridge = CvBridge()
 
-# markers_arr_pub = rospy.Publisher("/l22_aero_color/markers", ColorRectMarkerArray)
-# circles_arr_pub = rospy.Publisher("/l22_aero_color/circles", ColorRectMarkerArray)
+# markers_arr_pub = rospy.Publisher("/l22_aero_color/markers", ColorMarkerArray)
+# circles_arr_pub = rospy.Publisher("/l22_aero_color/circles", ColorMarkerArray)
 image_pub = rospy.Publisher("/l22_aero_color/debug_img", Image)
 # Параметры цвета маркеров
 # colors_p_hsv = {
@@ -197,13 +197,13 @@ objectPoint = np.array([(-MARKER_SIDE1_SIZE / 2, -MARKER_SIDE2_SIZE / 2, 0), (MA
 objectPoint_circles = np.array([(-CIRCLE_R, -CIRCLE_R, 0), (CIRCLE_R, -CIRCLE_R, 0), 
                         (CIRCLE_R, CIRCLE_R, 0), (-CIRCLE_R, CIRCLE_R, 0)])
 # print("objectPoint shape:", objectPoint.shape)
-class ColorRect:
+class Color:
     def __init__(self, cx_img=0, cy_img=0, color="none", points_img=[]):
         self.cx_img = cx_img
         self.cy_img = cy_img
         self.color = color
         self.points_img = points_img
-class ColorRectMarker_p:
+class ColorMarker_p:
     def __init__(self, cx_img=0, cy_img=0, color="none", points_img=[], cx_cam=0, cy_cam=0, cz_cam=0):
         self.cx_img = cx_img
         self.cy_img = cy_img
@@ -212,14 +212,14 @@ class ColorRectMarker_p:
         self.cx_cam = cx_cam
         self.cy_cam = cy_cam
         self.cz_cam = cz_cam
-    def fromColorRect(self, cr):
+    def fromColor(self, cr):
         self.cx_img = cr.cx_img
         self.cy_img = cr.cy_img
         self.color = cr.color
         self.points_img = cr.points_img
         return self
     def toMsg(self):
-        return ColorRectMarker(color=self.color, cx_img=self.cx_img, cy_img=self.cy_img, cx_cam=self.cx_cam, cy_cam=self.cy_cam, cz_cam=self.cz_cam, size1=MARKER_SIDE1_SIZE, size2=MARKER_SIDE2_SIZE)
+        return ColorMarker(color=self.color, cx_img=self.cx_img, cy_img=self.cy_img, cx_cam=self.cx_cam, cy_cam=self.cy_cam, cz_cam=self.cz_cam, size1=MARKER_SIDE1_SIZE, size2=MARKER_SIDE2_SIZE)
     def __str__(self):
         return "color: {}\n  coords: {} {} {}".format(self.color, str(self.cx_cam), str(self.cy_cam), str(self.cz_cam))
 
@@ -275,7 +275,7 @@ def img_colision_check(pnts, offset, image_shape=(240, 320, 3)):
 #                 M = cv2.moments(cnt)
 #                 cX = int((M["m10"] / (M["m00"] + 1e-7)))
 #                 cY = int((M["m01"] / (M["m00"] + 1e-7)))
-#                 result.append(ColorRect(color=color_name, cx_img=cX, cy_img=cY, points_img=points_img))
+#                 result.append(Color(color=color_name, cx_img=cX, cy_img=cY, points_img=points_img))
 #     return result
 
 def get_color_rects_circles(cnts, color_name, image_shape=(240, 320, 3)):
@@ -300,7 +300,7 @@ def get_color_rects_circles(cnts, color_name, image_shape=(240, 320, 3)):
                 M = cv2.moments(cnt)
                 cX = int((M["m10"] / (M["m00"] + 1e-7)))
                 cY = int((M["m01"] / (M["m00"] + 1e-7)))
-                result.append(ColorRect(color=color_name, cx_img=cX, cy_img=cY, points_img=points_img))
+                result.append(Color(color=color_name, cx_img=cX, cy_img=cY, points_img=points_img))
         elif len(approx) > 4 and abs(1 - rect[1][0] / (rect[1][1] + 1e-7)) < 0.2 and color_name in ["green", "yellow", "blue"] and abs(c_area / box_area) < 0.8:
             # elp = cv2.fitEllipse(cnt)
             
@@ -309,7 +309,7 @@ def get_color_rects_circles(cnts, color_name, image_shape=(240, 320, 3)):
                 M = cv2.moments(cnt)
                 cX = int((M["m10"] / (M["m00"] + 1e-7)))
                 cY = int((M["m01"] / (M["m00"] + 1e-7)))
-                circles.append(ColorRect(color=color_name, cx_img=cX, cy_img=cY, points_img=points_img))
+                circles.append(Color(color=color_name, cx_img=cX, cy_img=cY, points_img=points_img))
     return result, circles
 
 
@@ -363,7 +363,7 @@ def get_rect_pose(rect, op, cM, dC):
     """
     # print("shapes", op.shape, rect.points_img.shape)
     retval, rvec, tvec = cv2.solvePnP(np.array(op, dtype="float64"), np.array(rect.points_img, dtype="float64"), cM, dC)
-    return ColorRectMarker_p(cx_cam=tvec[0][0], cy_cam=tvec[1][0], cz_cam=tvec[2][0]).fromColorRect(rect)
+    return ColorMarker_p(cx_cam=tvec[0][0], cy_cam=tvec[1][0], cz_cam=tvec[2][0]).fromColor(rect)
 
 def img_clb(msg):
     global has_cam_info, cameraMatrix, distCoeffs, result_GLOBAL, circles_GLOBAL
@@ -375,7 +375,7 @@ def img_clb(msg):
     out = image.copy()
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
-    result_in_img_frame = [] # ColorRect
+    result_in_img_frame = [] # Color
     circles_in_img_frame = []
     for c_name in ["blue", "yellow", "green", "red", "brown"]:
         cnts, d_img = get_color_objs(image, hsv, colors_p_hsv[c_name])
@@ -402,8 +402,8 @@ def img_clb(msg):
         #     print("circles: \n " + "\n ".join(map(str, circles)))
     # cv2.waitKey(1)
     # Отправка результатов распознования 
-    # markers_arr_pub.publish(ColorRectMarkerArray(header=Header(stamp=rospy.Time.now(), frame_id="color_marker_cam"), markers=[r.toMsg() for r in result]))
-    # circles_arr_pub.publish(ColorRectMarkerArray(header=Header(stamp=rospy.Time.now(), frame_id="color_marker_cam"), markers=[r.toMsg() for r in circles]))
+    # markers_arr_pub.publish(ColorMarkerArray(header=Header(stamp=rospy.Time.now(), frame_id="color_marker_cam"), markers=[r.toMsg() for r in result]))
+    # circles_arr_pub.publish(ColorMarkerArray(header=Header(stamp=rospy.Time.now(), frame_id="color_marker_cam"), markers=[r.toMsg() for r in circles]))
     image_pub.publish(bridge.cv2_to_imgmsg(out, "bgr8"))
 
 
@@ -534,7 +534,7 @@ def land():
     rospy.sleep(0.79)
     arming(False)
 
-class ColorRectMarkerMap:
+class ColorMarkerMap:
     def __init__(self, cx_map=0, cy_map=0, cz_map=0, cx_img=0, cy_img=0, color="none"):
         self.cx_map = cx_map
         self.cy_map = cy_map
@@ -558,8 +558,8 @@ class Recognition:
         self.cv_image = np.zeros((240, 320, 3), dtype="uint8")
         self.image_sub = rospy.Subscriber('/main_camera/image_raw_throttled', Image, self.image_callback)
         self.qr_pub = rospy.Publisher('/qr_debug', Image, queue_size=1)
-        # self.coords_sub = sub = rospy.Subscriber("/l22_aero_color/markers", ColorRectMarkerArray, self.markers_arr_clb)
-        # self.circles_sub = rospy.Subscriber("/l22_aero_color/circles", ColorRectMarkerArray, self.circles_arr_clb)
+        # self.coords_sub = sub = rospy.Subscriber("/l22_aero_color/markers", ColorMarkerArray, self.markers_arr_clb)
+        # self.circles_sub = rospy.Subscriber("/l22_aero_color/circles", ColorMarkerArray, self.circles_arr_clb)
         self.result = []
         self.circles = []
     
@@ -567,7 +567,7 @@ class Recognition:
         # self.coords_thread.daemon = True
         # self.coords_thread.start()
 
-    def transform_marker(self, marker, frame_to="aruco_map"):# -> ColorRectMarkerMap:
+    def transform_marker(self, marker, frame_to="aruco_map"):# -> ColorMarkerMap:
         cx_map = 0
         cy_map = 0
         cz_map = 0
@@ -575,8 +575,8 @@ class Recognition:
             cx_map, cy_map, cz_map, _ = transform_xyz_yaw(
                 marker.cx_cam, marker.cy_cam, marker.cz_cam, 0, "main_camera_optical", frame_to, listener)
         except (tf.LookupException, tf.ConnectivityException):
-            print("ARUCOARUCOARUCO")
-        return ColorRectMarkerMap(color=marker.color, cx_map=cx_map, cy_map=cy_map, cz_map=cz_map)
+            print("TF erro")
+        return ColorMarkerMap(color=marker.color, cx_map=cx_map, cy_map=cy_map, cz_map=cz_map)
 
     def markers_arr_clb(self, msg):
         '''
