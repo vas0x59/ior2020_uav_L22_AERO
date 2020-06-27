@@ -11,7 +11,7 @@ from cv_bridge import CvBridge, CvBridgeError
 import cv2
 import numpy as np
 from l22_aero_vision.msg import ColorMarker, ColorMarkerArray
-# import tf
+from l22_aero_vision.srv import SetParameters, SetParametersResponse
 
 
 
@@ -85,12 +85,12 @@ type_mapping = {
 }
 
 # Размеры цветных маркеров 
-MARKER_SIDE1_SIZE = 0.35 # in m
-MARKER_SIDE2_SIZE = 0.35 # in m
-OBJ_S_THRESH = 350
-OFFSET = [61, 35]
+MARKER_SIDE1_SIZE = rospy.get_param("/l22_aero_color/rect_s1", 0.35) # in m
+MARKER_SIDE2_SIZE = rospy.get_param("/l22_aero_color/rect_s2", 0.35) # in m
+OBJ_S_THRESH = rospy.get_param("/l22_aero_color/obj_s_th", 350)
+OFFSET = rospy.get_param("/l22_aero_color/offset", [61, 35])
 
-CIRCLE_R = 0.2
+CIRCLE_R = rospy.get_param("/l22_aero_color/cricle_r", 0.2)
 
 objectPoint = np.array([(-MARKER_SIDE1_SIZE / 2, -MARKER_SIDE2_SIZE / 2, 0), (MARKER_SIDE1_SIZE / 2, -MARKER_SIDE2_SIZE / 2, 0), 
                         (MARKER_SIDE1_SIZE / 2, MARKER_SIDE2_SIZE / 2, 0), (-MARKER_SIDE1_SIZE / 2, MARKER_SIDE2_SIZE / 2, 0)])
@@ -315,5 +315,23 @@ image_sub = rospy.Subscriber(
 
 camera_info_sub = rospy.Subscriber(
     "camera_info", CameraInfo, camera_info_clb)
+
+def check_p(a, b):
+    if a is not None and a != float('nan'):
+        return a
+    else:
+        return b
+
+def set_parameters_f(msg):
+    global CIRCLE_R, MARKER_SIDE1_SIZE, MARKER_SIDE2_SIZE, OFFSET, OBJ_S_THRESH
+    CIRCLE_R = check_p(msg.circle_r, CIRCLE_R)
+    MARKER_SIDE1_SIZE = check_p(msg.rect_s1, MARKER_SIDE1_SIZE)
+    MARKER_SIDE2_SIZE = check_p(msg.rect_s2, MARKER_SIDE2_SIZE)
+    OBJ_S_THRESH = check_p(msg.obj_s_th, OBJ_S_THRESH)
+    OFFSET[0] = check_p(msg.offset_w, OFFSET[0])
+    OFFSET[1] = check_p(msg.offset_h, OFFSET[1])
+    return SetParametersResponse
+
+rospy.Service('/l22_aero_color/set_parametrs', SetParameters, set_parameters_f)
 
 rospy.spin()

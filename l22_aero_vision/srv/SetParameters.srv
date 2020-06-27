@@ -1,0 +1,7 @@
+float32 rect_s1
+float32 rect_s2
+float32 cricle_r
+int32 obj_s_th
+int32 offset_w
+int32 offset_h
+---

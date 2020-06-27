@@ -19,6 +19,10 @@ add_message_files(
   ColorMarker.msg
   ColorMarkerArray.msg
 )
+add_service_files(
+  FILES
+  SetParameters.srv
+)
 
 catkin_python_setup()
 
