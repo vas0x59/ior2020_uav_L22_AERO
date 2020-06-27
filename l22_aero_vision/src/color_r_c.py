@@ -275,7 +275,7 @@ def img_clb(msg):
     # image = cv2.medianBlur(image,3)
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     
-    cv2.imshow("image", image)
+    # cv2.imshow("image", image)
     result_in_img_frame = [] # ColorRect
     circles_in_img_frame = []
     for c_name in ["blue", "yellow", "green", "red", "brown"]:
@@ -285,7 +285,7 @@ def img_clb(msg):
         k = get_color_rects_circles(cnts, c_name)
         result_in_img_frame += k[0]
         circles_in_img_frame += k[1]
-        cv2.imshow(c_name, d_img)
+        # cv2.imshow(c_name, d_img)
     for i in result_in_img_frame:
         draw_color_rect(out, i)
     for i in circles_in_img_frame:
@@ -307,7 +307,7 @@ def img_clb(msg):
     markers_arr_pub.publish(ColorRectMarkerArray(header=Header(stamp=rospy.Time.now(), frame_id="color_marker_cam"), markers=[r.toMsg() for r in result]))
     circles_arr_pub.publish(ColorRectMarkerArray(header=Header(stamp=rospy.Time.now(), frame_id="color_marker_cam"), markers=[r.toMsg() for r in circles]))
     image_pub.publish(bridge.cv2_to_imgmsg(out, "bgr8"))
-    cv2.waitKey(1)
+    # cv2.waitKey(1)
 
 
 image_sub = rospy.Subscriber(
