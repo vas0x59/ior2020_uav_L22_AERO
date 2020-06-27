@@ -6,5 +6,5 @@
         <remap from="image_raw" to="main_camera/image_raw_throttled"/>
         <remap from="camera_info" to="main_camera/camera_info"/>
     </node>
-    <!-- <node pkg="l22_aero_vision" type="viz.py" name="l22_aero_vision_viz_node" output="screen" clear_params="true"/> -->
+    <node pkg="l22_aero_vision" type="viz.py" name="l22_aero_vision_viz_node" output="screen" clear_params="true"/>
 </launch>
