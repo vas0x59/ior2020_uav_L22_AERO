@@ -1,7 +1,12 @@
-# ior2020_uav_L22_AERO
-[Задание](http://robolymp.ru/files/ior2020/ibpla/IOR2020_online_iUAV_final_regulations_v2.pdf)  
-## Final Code - ALL_IN_ONE.py
+## Innopolis Open Robotics 2020
 
+team L22_**ÆRO** - the **1st** place
+<ul style="list-style: none; font-size:15px; padding-left:10px">
+ <li><b>Юрьев Василий</b></li>
+ <li><b>Оконешников Дмитрий</b></li>
+</ul>
+
+[Задание](http://robolymp.ru/files/ior2020/ibpla/IOR2020_online_iUAV_final_regulations_v2.pdf) 
 ## ROS
 Созданные ноды, топики, сообщения и сервисы
 
@@ -53,5 +58,6 @@ int32 offset_w
 int32 offset_h
 ---
 ```
+---
 
 by Vasily Yuryev and Dmitriy Okoneshnikov
