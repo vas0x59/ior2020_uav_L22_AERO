@@ -5,20 +5,54 @@
 
 # Final Code - ALL_IN_ONE.py
 
----------
----------
+## ROS
+Созданные ноды, топики, сообщения и сервисы
 
-### L22_AERO_CODE
-#### Nodes
 
-#### Topics
+### Nodes
 
-#### Launch files
-### L22_AERO_VISION
-#### Nodes
+<ul style="list-style: none; font-size:15px; padding-left:10px">
+ <li>l22_aero_vision/<b>color_r_c.py</b> - распознование цветных объектов</li>
+ <li>l22_aero_vision/<b>viz.py</b> - визуализация в RViz</li>
+ <li>l22_aero_code/<b>full_task.py</b> - основной код  </li>
+</ul>
 
-#### Topics
+### Topics
 
-#### Launch files
+<ul style="list-style: none; font-size:15px; padding-left:10px">
+ <li><b>/l22_aero_color/markers</b> l22_aero_vision/ColorMarkerArray - список прямоугольных маркеров</li>
+ <li><b>/l22_aero_color/circles</b> l22_aero_vision/ColorMarkerArray - список круглых маркеров</li>
+ <li><b>/l22_aero_color/debug_img</b> sensor_msgs/Image - изображение для отладки </li>
+ <li><b>/qr_debug</b> sensor_msgs/Image - изображение для отладки </li>
+</ul>
 
-GAZEBO
+
+### Messages
+#### ColorMarker
+```cpp
+string color
+int16 cx_img
+int16 cy_img
+float32 cx_cam
+float32 cy_cam
+float32 cz_cam
+float32 size1
+float32 size2
+int16 type
+```
+#### ColorMarkerArray
+```cpp
+std_msgs/Header header
+l22_aero_vision/ColorMarker[] markers
+```
+### Services
+#### SetParameters
+```
+float32 rect_s1
+float32 rect_s2
+float32 circle_r
+int32 obj_s_th
+int32 offset_w
+int32 offset_h
+---
+```
