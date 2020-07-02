@@ -53,3 +53,5 @@ int32 offset_w
 int32 offset_h
 ---
 ```
+
+by Vasily Yuryev and Dmitriy Okoneshnikov
