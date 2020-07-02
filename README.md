@@ -1,9 +1,6 @@
 # ior2020_uav_L22_AERO
 [Задание](http://robolymp.ru/files/ior2020/ibpla/IOR2020_online_iUAV_final_regulations_v2.pdf)  
-[Инструкция](https://github.com/vas0x59/ior2020_uav_L22_AERO/blob/master/instruction.pdf)
-
-
-# Final Code - ALL_IN_ONE.py
+## Final Code - ALL_IN_ONE.py
 
 ## ROS
 Созданные ноды, топики, сообщения и сервисы
