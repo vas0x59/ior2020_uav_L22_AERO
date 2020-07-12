@@ -191,7 +191,7 @@ class Recognition:
         '''
         Функция для парсинга координат цветных маркеров
         '''
-        self.result = []
+        # self.result = []
         for marker in msg.markers:
             self.result.append(self.transform_marker(marker, frame_to="aruco_map"))
 
@@ -199,7 +199,7 @@ class Recognition:
         '''
         Функция для парсинга координат точек для посадки из топика
         '''
-        self.circles = []
+        # self.circles = []
         for marker in msg.markers:
             self.circles.append(self.transform_marker(marker, frame_to="aruco_map"))
 
@@ -469,7 +469,7 @@ while j < len(landingPath):
     if len(circles_copy) == 0:
         if last == None:
             navigate_wait(landCoordinate[0], landCoordinate[1], 1.5)
-        else:
+        elif len(circles_copy) > 0:
             navigate_wait(circles_copy[-1].cx_map, circles_copy[-1].cy_map, 1.5)
 
     telem = get_telemetry_aruco()
@@ -485,6 +485,8 @@ landing_update_rate = rospy.Rate(3.7)
 
 while (time.time() - time_st) < TIMEOUT_H:
     markers = [i for i in rc.circles if circle_type_mapping[i.color] == markerType]
+    rc.circles = []
+    rc.result = []
     print(markers)
     if len(markers) > 0:
         marker = markers[0]
@@ -508,7 +510,7 @@ while (time.time() - time_st) < TIMEOUT_H:
 
 print("LANDDDDDDDDDDDDDDDD")
 land()
-vr.stop()
+# vr.stop()
 rospy.sleep(1.5)
 print("DISARM")
 arming(False)
