@@ -6,7 +6,8 @@ team L22_**ÆRO** - the **1st** place
  <li><b>Оконешников Дмитрий</b></li>
 </ul>
 
-[Задание](http://robolymp.ru/files/ior2020/ibpla/IOR2020_online_iUAV_final_regulations_v2.pdf) 
+[Задание](http://robolymp.ru/files/ior2020/ibpla/IOR2020_online_iUAV_final_regulations_v2.pdf)  
+[Статья на gitbook COEX](https://clover.coex.tech/ru/innopolis_open_L22_AERO.html)  
 ## ROS
 Созданные ноды, топики, сообщения и сервисы
 
